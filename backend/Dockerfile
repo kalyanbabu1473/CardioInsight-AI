@@ -29,6 +29,13 @@ ENV ENVIRONMENT=production \
     ML_FEATURES_PATH=/app/Models/CardioAI_Assessment_Features.pkl \
     DATABASE_URL=sqlite:////app/data/cardioinsight.db
 
+# Build-time gate: fail the build if the model is an LFS pointer, unloadable,
+# or does not exactly match the 44-feature contract. Only this script is copied
+# (backend/scripts also holds large backup artifacts that must stay out of the
+# image). Runs as root before the unprivileged USER switch.
+COPY backend/scripts/verify_model.py ./scripts/verify_model.py
+RUN python ./scripts/verify_model.py
+
 # Application code runs unprivileged; the data dir is writable by UID 10001.
 RUN mkdir -p /app/data && chown -R 10001:10001 /app
 USER 10001

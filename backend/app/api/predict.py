@@ -13,7 +13,7 @@ import logging
 from fastapi import APIRouter, HTTPException, status
 
 from app.core.feature_contract import load_contract
-from app.ml.model_loader import model_ready
+from app.ml.model_loader import model_ready, model_unavailable_reason
 from app.ml.prediction_service import MODEL_NAME, predict
 from app.schemas.prediction import PredictRequest, PredictionResponse
 
@@ -24,11 +24,16 @@ router = APIRouter(prefix="/api/predict", tags=["predict"])
 
 @router.get("/status")
 def predict_status():
-    """Health probe for the ML service (model availability + feature count)."""
+    """Health probe for the ML service (model availability + feature count).
+
+    When the model is unavailable a safe ``detail`` reason is included so
+    production can be diagnosed from the API alone.
+    """
     ready = model_ready()
     return {
         "model": MODEL_NAME if ready else None,
         "ready": ready,
+        "detail": None if ready else model_unavailable_reason(),
     }
 
 
@@ -44,7 +49,8 @@ async def run_predict(payload: PredictRequest) -> PredictionResponse:
         logger.error("Prediction attempted while ML model is unavailable.")
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Prediction service is temporarily unavailable.",
+            detail=model_unavailable_reason()
+            or "Prediction service is temporarily unavailable.",
         )
 
     try:

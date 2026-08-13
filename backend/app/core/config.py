@@ -57,12 +57,13 @@ def _resolve_allowed_origins() -> list[str]:
     raw = os.getenv("ALLOWED_ORIGINS", "")
     if raw:
         return [o.strip() for o in raw.split(",") if o.strip()]
-    # Safe local-dev defaults.
+    # Safe local-dev defaults plus the production frontend origin.
     return [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://cardioinsight-frontend.onrender.com",
     ]
 
 

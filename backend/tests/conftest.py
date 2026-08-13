@@ -1,7 +1,8 @@
 """Pytest fixtures for the CardioInsight backend.
 
-Points the app at a temporary SQLite database and the real production model
-artifacts (the 43-feature research Random Forest + the feature contract) before
+Points the app at a temporary SQLite database and the exact production model
+artifacts shipped in the Docker image (the tracked 44-feature Random Forest
+``Models/Random_Forest/Random_Forest_Model.pkl`` + the feature contract) before
 any application module is imported, then exposes a ``TestClient`` for endpoint
 tests.
 """
@@ -21,7 +22,7 @@ sys.path.insert(0, str(BACKEND_DIR))
 
 os.environ.setdefault(
     "ML_MODEL_PATH",
-    str(REPO_ROOT / "Models" / "Random_Forest_Model.pkl"),
+    str(REPO_ROOT / "Models" / "Random_Forest" / "Random_Forest_Model.pkl"),
 )
 os.environ.setdefault(
     "ML_FEATURES_PATH",

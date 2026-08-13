@@ -6,13 +6,17 @@ from app.ml.prediction_service import MODEL_NAME
 def test_health_ok(client):
     res = client.get("/api/health")
     assert res.status_code == 200
-    assert res.json() == {"status": "ok"}
+    body = res.json()
+    assert body["status"] == "ok"
+    assert body["database"] in {"connected", "disconnected"}
 
 
 def test_legacy_health_alias(client):
     res = client.get("/health")
     assert res.status_code == 200
-    assert res.json() == {"status": "ok"}
+    body = res.json()
+    assert body["status"] == "ok"
+    assert body["database"] in {"connected", "disconnected"}
 
 
 def _valid_input():

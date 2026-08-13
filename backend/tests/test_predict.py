@@ -54,6 +54,7 @@ def test_predict_status_reports_ready(client):
     body = res.json()
     assert body["ready"] is True
     assert body["model"] == MODEL_NAME
+    assert body["detail"] is None
 
 
 def test_predict_valid_input(client):
