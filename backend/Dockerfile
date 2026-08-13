@@ -16,7 +16,7 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY backend/app ./app
 
 # Only the deployment model artifacts (research models stay out of the image).
-COPY Models/Random_Forest_Model.pkl ./Models/Random_Forest_Model.pkl
+COPY Models/Random_Forest/Random_Forest_Model.pkl ./Models/Random_Forest_Model.pkl
 COPY Models/CardioAI_Assessment_Features.pkl ./Models/CardioAI_Assessment_Features.pkl
 COPY feature_contract.json ./feature_contract.json
 
