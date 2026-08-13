@@ -5,8 +5,11 @@ local SQLite file inside ``backend/database/``; for production point
 ``DATABASE_URL`` at PostgreSQL/Supabase without changing any code.
 
 ML model artifacts live in the repository ``Models/`` directory by default
-(the 44-feature research Random Forest ``Random_Forest_Model.pkl`` — the real
-training model — plus the repo-root ``feature_contract.json`` contract).
+(the tracked 44-feature production Random Forest
+``Models/Random_Forest/Random_Forest_Model.pkl`` — the real training model —
+plus the repo-root ``feature_contract.json`` contract). Paths resolve relative
+to the repository root via this module's location, so they work regardless of
+the process working directory (local dev, GitHub Actions, native Render).
 Override with ``ML_MODEL_PATH`` / ``ML_CONTRACT_PATH`` (or the Docker image
 variants) in production.
 """
@@ -39,7 +42,7 @@ ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 # --- Model artifacts --------------------------------------------------------
 model_path = os.getenv(
     "ML_MODEL_PATH",
-    str(DEFAULT_MODELS_DIR / "Models" / "Random_Forest_Model.pkl"),
+    str(DEFAULT_MODELS_DIR / "Models" / "Random_Forest" / "Random_Forest_Model.pkl"),
 )
 features_path = os.getenv(
     "ML_FEATURES_PATH",

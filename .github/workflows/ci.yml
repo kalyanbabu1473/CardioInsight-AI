@@ -11,6 +11,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
@@ -29,10 +31,31 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          lfs: true
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'
+      - name: Ensure Git LFS content is present
+        run: git lfs pull
+      - name: Verify model artifact is the real model (not an LFS pointer)
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('Models/Random_Forest/Random_Forest_Model.pkl')
+          exists = p.exists()
+          size = p.stat().st_size if exists else None
+          is_pointer = (
+              p.read_bytes()[:40].startswith(b'version https://git-lfs.github.com/spec/v1')
+              if exists else False
+          )
+          print('exists=', exists)
+          print('size=', size)
+          print('lfs_pointer=', is_pointer)
+          if not exists or is_pointer or size < 10_000_000:
+              raise SystemExit(1)
+          PY
       - name: Install backend requirements
         run: |
           python -m pip install --upgrade pip
