@@ -16,14 +16,16 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 COPY backend/app ./app
 
 # Only the deployment model artifacts (research models stay out of the image).
-COPY Models/CardioAI_Assessment_Model.pkl ./Models/CardioAI_Assessment_Model.pkl
+COPY Models/Random_Forest_Model.pkl ./Models/Random_Forest_Model.pkl
 COPY Models/CardioAI_Assessment_Features.pkl ./Models/CardioAI_Assessment_Features.pkl
+COPY feature_contract.json ./feature_contract.json
 
 # Production defaults (override via env / compose).
 ENV ENVIRONMENT=production \
     HOST=0.0.0.0 \
     PORT=8000 \
-    ML_MODEL_PATH=/app/Models/CardioAI_Assessment_Model.pkl \
+    ML_MODEL_PATH=/app/Models/Random_Forest_Model.pkl \
+    ML_CONTRACT_PATH=/app/feature_contract.json \
     ML_FEATURES_PATH=/app/Models/CardioAI_Assessment_Features.pkl \
     DATABASE_URL=sqlite:////app/data/cardioinsight.db
 
