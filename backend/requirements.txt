@@ -5,6 +5,7 @@ uvicorn[standard]>=0.52,<1.0
 sqlalchemy>=2.0,<3.0
 pydantic>=2.13,<3.0
 python-dotenv>=1.0,<2.0
+psycopg2-binary
 
 # Database driver — PostgreSQL. SQLAlchemy still supports SQLite via the same
 # DATABASE_URL-agnostic session layer.
