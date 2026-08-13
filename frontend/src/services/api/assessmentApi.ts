@@ -1,16 +1,17 @@
 /**
  * API client — thin axios wrapper around the CardioInsight persistence API.
  *
- * Points at the backend via VITE_API_URL (defaults to `/api` in dev, which the
- * Vite dev server proxies to the FastAPI server).
+ * The backend base URL is resolved from the centralized config
+ * (`src/services/api/config.ts`), which reads `VITE_API_BASE_URL`. In local
+ * development it defaults to the relative `/api` path, which the Vite dev
+ * server proxies to the FastAPI server.
  */
 
 import axios from "axios";
 
 import type { AssessmentResult } from "@/features/assessment/assessmentResult";
 import type { AssessmentInput } from "@/features/assessment/assessmentService";
-
-const BASE_URL = import.meta.env.VITE_API_URL ?? "/api";
+import { API_BASE_URL } from "./config";
 
 /** Payload the frontend sends to persist a completed assessment. */
 export interface CreateAssessmentPayload {
@@ -21,7 +22,7 @@ export interface CreateAssessmentPayload {
 }
 
 const client = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL,
   headers: { "Content-Type": "application/json" },
   timeout: 10000,
 });
