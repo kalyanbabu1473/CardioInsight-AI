@@ -1,0 +1,32 @@
+.connector {
+  align-self: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  opacity: 0.55;
+}
+
+.line {
+  width: 24px;
+  height: 2px;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-divider),
+    var(--color-primary-light)
+  );
+}
+
+.chevron {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-primary-light);
+}
+
+@media (max-width: 1024px) {
+  .connector {
+    display: none;
+  }
+}

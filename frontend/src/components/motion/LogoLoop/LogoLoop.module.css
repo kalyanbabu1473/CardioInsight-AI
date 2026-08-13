@@ -1,0 +1,63 @@
+.viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* Fade cards out at both ends using a GPU-friendly mask. */
+.fadeEdges {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--edge-width, 120px),
+    #000 calc(100% - var(--edge-width, 120px)),
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--edge-width, 120px),
+    #000 calc(100% - var(--edge-width, 120px)),
+    transparent
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: logo-loop-scroll var(--logo-duration, 45s) linear infinite;
+  will-change: transform;
+}
+
+.pauseOnHover:hover .track {
+  animation-play-state: paused;
+}
+
+.group {
+  display: flex;
+  align-items: stretch;
+  flex-shrink: 0;
+  gap: var(--logo-gap, 24px);
+  padding-right: var(--logo-gap, 24px);
+}
+
+@keyframes logo-loop-scroll {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Keep content readable when the user prefers reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+
+  .viewport {
+    overflow-x: auto;
+  }
+}

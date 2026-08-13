@@ -1,0 +1,62 @@
+# Python / backend
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+*.mypy_cache/
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node / frontend (kept minimal; see frontend/.gitignore)
+node_modules/
+dist/
+npm-debug.log*
+
+# ML artefacts — large serialized research models + train-only outputs are NOT
+# committed. The deployment artifact (assessment model + feature list) IS needed
+# at runtime by backend/CI/Docker, so it is tracked via explicit negation (push
+# the large ~55 MB binary with Git LFS).
+Models/*.pkl
+!Models/CardioAI_Assessment_Model.pkl
+!Models/CardioAI_Assessment_Features.pkl
+Models/*.csv
+Models/*.png
+Outputs/
+
+# Deployment full-config backups (never commit secrets)
+docker-compose.override.yml
+*.networkconfig
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local inventory/tree dumps (repo hygiene artifacts)
+project_tree.txt
+overall_tree.txt
+frontend_tree.txt
+frontend_inventory.csv
+project_inventory.csv
+feature_summary.csv
+Coreleation.png
+frontend.zip
+Models.zip
+
+# Research scratchwork (not part of the deployable app)
+Stock_*.py
+Stock_data_analysis.ipynb
+teja_project.ipynb
+CardioInsights_folder.py
+nhanes_adult_*.csv
+# Large research datasets
+frontend/public/datasets/*.csv

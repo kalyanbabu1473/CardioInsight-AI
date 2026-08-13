@@ -1,0 +1,17 @@
+.app{
+
+    min-height:100vh;
+
+}
+
+.page{
+
+    width:100%;
+
+    max-width:var(--page-max-width);
+
+    margin:auto;
+
+    padding:var(--space-6);
+
+}

@@ -1,0 +1,294 @@
+.card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.header h2 {
+  font-size: var(--font-h3);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.champBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  background: var(--color-warning-tint);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 30%, var(--color-border));
+  color: var(--color-warning);
+  white-space: nowrap;
+}
+
+.champBadge > span {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
+
+.champBadge small {
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+}
+
+.champBadge strong {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+}
+
+.metrics {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-2);
+}
+
+.metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+}
+
+.metric span {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+}
+
+.metric strong {
+  font-size: var(--font-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.summary {
+  margin: var(--space-4) 0 0;
+  font-size: var(--font-sm);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.detailsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  align-self: flex-start;
+  margin-top: var(--space-3);
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  color: var(--color-primary-light);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  font-family: inherit;
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.detailsToggle:hover {
+  color: var(--color-primary);
+}
+
+.detailsToggle svg {
+  transition: transform var(--transition-fast) var(--ease-out);
+}
+
+.chevronOpen {
+  transform: rotate(180deg);
+}
+
+.details {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 0;
+}
+
+.details div {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-alt);
+  border-radius: var(--radius-md);
+}
+
+.details dt {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.details dd {
+  margin: 0;
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.rocPanel {
+  margin-top: var(--space-5);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  padding: var(--space-4);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.rocTitle {
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin: 0 0 var(--space-4);
+}
+
+.rocLayout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: var(--space-5);
+  align-items: center;
+}
+
+.bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.barRow {
+  display: grid;
+  grid-template-columns: 104px 1fr 64px;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.barLabel {
+  font-size: var(--font-label);
+  color: var(--color-text-secondary);
+  font-weight: var(--weight-medium);
+  white-space: nowrap;
+}
+
+.track {
+  height: 10px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface);
+  overflow: hidden;
+}
+
+.fill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.4);
+}
+
+.barValue {
+  font-size: var(--font-label);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  text-align: right;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .rocLayout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plot {
+  width: 100%;
+  max-width: 300px;
+  margin: 0 auto;
+  justify-self: center;
+}
+
+.rocSvg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.gridline {
+  stroke: var(--color-border);
+  stroke-width: 1;
+}
+
+.diagonal {
+  stroke: var(--color-divider);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 4;
+}
+
+.area {
+  fill: var(--color-primary);
+  opacity: 0.08;
+  animation: roc-area-in 1.4s var(--ease-out) both;
+}
+
+.curve {
+  stroke: var(--color-primary);
+  stroke-width: 2.5;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  animation: roc-draw 1.4s var(--ease-out) both;
+}
+
+.legend {
+  font-size: 9px;
+  font-weight: var(--weight-semibold);
+  fill: var(--color-text-secondary);
+  animation: roc-legend-in 0.8s var(--ease-out) 0.7s both;
+}
+
+@keyframes roc-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes roc-area-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 0.08;
+  }
+}
+
+@keyframes roc-legend-in {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}

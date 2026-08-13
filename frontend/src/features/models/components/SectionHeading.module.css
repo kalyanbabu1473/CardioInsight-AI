@@ -1,0 +1,38 @@
+.heading {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.iconWrap {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.copy {
+  flex: 1;
+}
+
+.copy h2 {
+  font-size: var(--font-h2);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-1);
+}
+
+.copy p {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+  max-width: 640px;
+  line-height: var(--leading-relaxed);
+}

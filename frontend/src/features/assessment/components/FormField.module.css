@@ -1,0 +1,167 @@
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.label {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+}
+
+.inputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-alt);
+  transition:
+    border-color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out),
+    background var(--transition-fast) var(--ease-out);
+}
+
+.inputWrap:focus-within {
+  border-color: var(--color-primary-light);
+  background: var(--color-surface);
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+}
+
+.inputWrapError {
+  border-color: var(--color-danger);
+}
+
+.inputWrapError:focus-within {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-tint);
+}
+
+.input {
+  width: 100%;
+  height: var(--input-height);
+  padding: 0 var(--space-4);
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--color-text-primary);
+  font-family: inherit;
+  font-size: var(--font-body);
+  font-weight: var(--weight-medium);
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+.input::-webkit-outer-spin-button,
+.input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.inputReadOnly {
+  color: var(--color-text-secondary);
+  cursor: default;
+}
+
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  cursor: pointer;
+  padding-right: var(--space-9);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right var(--space-3) center;
+}
+
+.suffix {
+  position: absolute;
+  right: var(--space-4);
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+  pointer-events: none;
+}
+
+.autoValue {
+  display: flex;
+  align-items: center;
+  font-size: var(--font-body);
+  font-weight: var(--weight-semibold);
+}
+
+.autoStatus {
+  min-height: 18px;
+}
+
+.error {
+  font-size: var(--font-label);
+  color: var(--color-danger);
+  font-weight: var(--weight-medium);
+}
+
+.hint {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+  line-height: var(--leading-normal);
+}
+
+.suggestion {
+  font-size: var(--font-label);
+  color: var(--color-primary);
+  font-weight: var(--weight-medium);
+  min-height: 18px;
+}
+
+.range {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+/* segmented control */
+.segment {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: 1fr;
+  gap: var(--space-2);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+}
+
+.segmentButton {
+  padding: var(--space-3) var(--space-2);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out);
+}
+
+.segmentButton:hover {
+  color: var(--color-text-primary);
+}
+
+.segmentActive {
+  background: var(--color-surface);
+  color: var(--color-primary);
+  box-shadow: var(--shadow-xs);
+}
+
+@media (max-width: 640px) {
+  .segmentButton {
+    font-size: var(--font-label);
+  }
+}

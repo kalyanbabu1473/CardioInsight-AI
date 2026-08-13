@@ -1,0 +1,123 @@
+.topbar {
+  height: var(--topbar-height);
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 560px) 1fr;
+  align-items: center;
+  gap: var(--space-5);
+  padding: 0 var(--space-6);
+  background: var(--glass-bg);
+  backdrop-filter: blur(30px);
+  border-bottom: 1px solid var(--glass-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-topbar);
+}
+
+.left {
+  justify-self: start;
+  min-width: 0;
+}
+
+.left h1 {
+  font-size: var(--font-h3);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.breadcrumb {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+  margin-bottom: 2px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.center {
+  justify-self: center;
+  width: 100%;
+  min-width: 0;
+  display: flex;
+  justify-content: center;
+}
+
+.right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.iconBtn {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out),
+    transform var(--transition-fast) var(--ease-out);
+}
+
+.iconBtn:hover {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.iconBtn:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+}
+
+.iconBtn:active {
+  transform: scale(0.92);
+}
+
+@media (max-width: 1024px) {
+  .topbar {
+    grid-template-columns: 1fr minmax(240px, 400px) 1fr;
+    gap: var(--space-4);
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    grid-template-columns: 1fr minmax(0, 320px) 1fr;
+    padding: 0 var(--space-4);
+  }
+
+  .left h1 {
+    font-size: var(--font-h4);
+  }
+}
+
+@media (max-width: 560px) {
+  .topbar {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "search actions";
+  }
+
+  .left {
+    display: none;
+  }
+
+  .center {
+    grid-area: search;
+  }
+
+  .right {
+    grid-area: actions;
+  }
+}

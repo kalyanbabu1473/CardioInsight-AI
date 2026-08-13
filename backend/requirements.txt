@@ -1,0 +1,26 @@
+# CardioInsight AI backend runtime dependencies.
+# Runtime API layer
+fastapi>=0.141,<1.0
+uvicorn[standard]>=0.52,<1.0
+sqlalchemy>=2.0,<3.0
+pydantic>=2.13,<3.0
+python-dotenv>=1.0,<2.0
+
+# Database driver — PostgreSQL. SQLAlchemy still supports SQLite via the same
+# DATABASE_URL-agnostic session layer.
+psycopg[binary]>=3.2,<4.0
+
+# ML serving. The deployed CardioAI_Assessment_Model.pkl was trained and
+# verified with scikit-learn 1.9.0 — do NOT downgrade.
+scikit-learn>=1.9.0,<1.10
+joblib>=1.5,<2.0
+numpy>=2.0,<3.0
+pandas>=2.2,<4.0
+
+# Explainability. TreeSHAP gives exact per-prediction feature attributions for
+# the deployed ensemble; used to render the report's contribution analysis.
+shap>=0.52,<1.0
+
+# Testing (optional; not required at runtime)
+pytest>=8.0
+httpx>=0.27

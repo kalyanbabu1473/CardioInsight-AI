@@ -1,0 +1,241 @@
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.subgroupColumns {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.subgroupColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.subgroupTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+/* Review step */
+.reviewGroup {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+}
+
+.reviewGroupHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.reviewGroupTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.reviewGroupIcon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  background: var(--color-primary-tint);
+  color: var(--color-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.reviewValues {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-2) var(--space-4);
+}
+
+.reviewValue {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-1);
+  border-bottom: 1px dashed var(--color-divider);
+  font-size: var(--font-sm);
+}
+
+.reviewValue dt {
+  color: var(--color-text-muted);
+}
+
+.reviewValue dd {
+  margin: 0;
+  color: var(--color-text-primary);
+  font-weight: var(--weight-semibold);
+  text-align: right;
+}
+
+/* model card */
+.modelCard {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: linear-gradient(
+    135deg,
+    var(--color-primary-tint) 0%,
+    var(--color-surface-alt) 100%
+  );
+  border: 1px solid var(--color-border);
+}
+
+.modelIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modelMeta {
+  flex: 1;
+}
+
+.modelMeta strong {
+  display: block;
+  font-size: var(--font-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.modelMeta span {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.runRow {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: var(--space-2);
+}
+
+.runButton {
+  min-width: 260px;
+}
+
+/* expandable advanced biomarkers */
+.expandHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  padding: var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition:
+    border-color var(--transition-fast) var(--ease-out),
+    background var(--transition-fast) var(--ease-out);
+  text-align: left;
+  font-family: inherit;
+}
+
+.expandHeader:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-tint);
+}
+
+.expandIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.expandTitle {
+  flex: 1;
+  min-width: 0;
+}
+
+.expandTitle strong {
+  display: block;
+  font-size: var(--font-body);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.expandTitle span {
+  display: block;
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.expandChevron {
+  color: var(--color-text-muted);
+  transition: transform var(--transition-normal) var(--ease-out);
+}
+
+.expandChevronOpen {
+  transform: rotate(180deg);
+}
+
+.expandBody {
+  overflow: hidden;
+  padding: 0 var(--space-4);
+}
+
+.expandInner {
+  padding: var(--space-5) 0;
+}
+
+.bmiPlaceholder {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.reviewStack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+@media (max-width: 640px) {
+  .fieldGrid,
+  .reviewValues,
+  .subgroupColumns {
+    grid-template-columns: 1fr;
+  }
+}

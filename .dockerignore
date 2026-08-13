@@ -1,0 +1,40 @@
+# Keep the Docker build context focused and self-contained.
+
+# VCS / tooling
+.git
+.github
+.agents
+**/.git
+**/__pycache__
+**/*.pyc
+
+# Virtualenvs
+backend/.venv
+frontend/node_modules
+frontend/dist
+
+# Train-only data (kept out of images)
+Outputs
+research
+Models/*
+!Models/CardioAI_Assessment_Model.pkl
+!Models/CardioAI_Assessment_Features.pkl
+
+# The 124 MB downloadable dataset stays in the image by default
+# (INCLUDE_DATASET=true in docker-compose). See DEPLOYMENT.md to slim the image.
+
+# Local storage / transient files
+*.db
+*.zip
+*.log
+.env
+.env.local
+project_tree.txt
+overall_tree.txt
+frontend_inventory.csv
+project_inventory.csv
+feature_summary.csv
+Stock_*.py
+Coreleation.png
+nhanes_adult_*.csv
+Random_Forest_Model.pkl

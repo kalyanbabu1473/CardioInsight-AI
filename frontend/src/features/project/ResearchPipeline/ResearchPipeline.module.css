@@ -1,0 +1,95 @@
+.section {
+  position: relative;
+  overflow: hidden;
+  margin-top: var(--gap-section);
+  padding: var(--space-8) 0 var(--space-9);
+}
+
+.section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(
+      circle at 50% 20%,
+      var(--color-primary-tint),
+      transparent 38%
+    ),
+    radial-gradient(
+      circle at 15% 45%,
+      var(--color-purple-tint),
+      transparent 28%
+    ),
+    radial-gradient(
+      circle at 85% 55%,
+      var(--color-ai-tint),
+      transparent 30%
+    );
+  opacity: 0.7;
+}
+
+.header {
+  position: relative;
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 1px solid color-mix(in srgb, var(--color-purple) 20%, transparent);
+  background: var(--color-purple-tint);
+  color: var(--color-purple);
+  font-size: var(--font-label);
+  font-weight: var(--weight-bold);
+  letter-spacing: 0.08em;
+}
+
+.title {
+  margin: var(--space-4) 0 var(--space-3);
+  font-size: var(--font-h1);
+  font-weight: var(--weight-extrabold);
+  line-height: var(--leading-tight);
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.subtitle {
+  max-width: 640px;
+  margin: 0 auto;
+  font-size: var(--font-body);
+  line-height: var(--leading-relaxed);
+  color: var(--color-text-secondary);
+}
+
+.pipelineCard {
+  position: relative;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+  padding: var(--space-8) var(--space-7);
+  border-radius: var(--radius-xl);
+  background: var(--glass-bg);
+  backdrop-filter: var(--glass-blur);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-lg);
+}
+
+@media (max-width: 768px) {
+  .section {
+    margin-top: var(--space-8);
+    padding: var(--space-7) 0 var(--space-8);
+  }
+
+  .title {
+    font-size: var(--font-h2);
+  }
+
+  .pipelineCard {
+    padding: var(--space-5) var(--space-4);
+    border-radius: var(--radius-xl);
+  }
+}

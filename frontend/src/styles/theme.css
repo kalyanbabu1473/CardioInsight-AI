@@ -1,0 +1,13 @@
+/* Theme handled via CSS custom properties loaded from tokens.css.
+   The `data-theme` attribute is set on <html> by the ThemeProvider
+   (and a small inline script in index.html to avoid a flash of
+   unthemed content on first paint). */
+
+:root,
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}

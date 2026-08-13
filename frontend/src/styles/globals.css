@@ -1,0 +1,82 @@
+@import "./tokens.css";
+
+*,
+*::before,
+*::after{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+
+    background:var(--color-background);
+
+    color:var(--color-text-primary);
+
+    min-height:100vh;
+
+    text-rendering:optimizeLegibility;
+
+    -webkit-font-smoothing:antialiased;
+
+    overflow-x:hidden;
+
+}
+
+button{
+
+    border:none;
+
+    outline:none;
+
+    background:none;
+
+    cursor:pointer;
+
+}
+
+a{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+img{
+
+    display:block;
+
+    max-width:100%;
+
+}
+
+ul{
+
+    list-style:none;
+
+}
+:root{
+
+    --font-heading:"Plus Jakarta Sans",sans-serif;
+
+    --font-body:"Inter",sans-serif;
+
+}
+
+body{
+
+    font-family:var(--font-body);
+
+}
+
+h1,h2,h3,h4,h5,h6{
+
+    font-family:var(--font-heading);
+
+}

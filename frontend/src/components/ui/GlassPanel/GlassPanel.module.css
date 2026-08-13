@@ -1,0 +1,32 @@
+.glass {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  box-shadow: var(--shadow-md);
+  overflow: hidden;
+}
+
+/* blur */
+.sm {
+  backdrop-filter: blur(16px);
+}
+
+.md {
+  backdrop-filter: var(--glass-blur);
+}
+
+.lg {
+  backdrop-filter: blur(36px);
+}
+
+/* opacity */
+.light {
+  background: var(--glass-light);
+}
+
+.medium {
+  background: var(--glass-medium);
+}
+
+.strong {
+  background: var(--glass-strong);
+}

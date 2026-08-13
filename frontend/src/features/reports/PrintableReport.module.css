@@ -1,0 +1,25 @@
+/* Host is fixed off-canvas but keeps a real width so recharts'
+   ResponsiveContainer can measure a concrete pixel width at render time.
+   A4 content width (210mm page minus 2 × 14mm margins) at 96dpi ≈ 688px,
+   so the chart SVGs are laid out at the same width they will occupy on paper. */
+.screenHost {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  width: 688px;
+  max-width: 688px;
+  pointer-events: none;
+  opacity: 0;
+  z-index: -1;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  width: 100%;
+}
+
+.footer {
+  display: block;
+}

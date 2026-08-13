@@ -1,0 +1,220 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 1fr 44px;
+  gap: var(--space-3);
+  align-items: center;
+  width: 100%;
+  padding: var(--space-1) var(--space-2);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-md);
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    opacity var(--transition-fast) var(--ease-out),
+    transform var(--transition-fast) var(--ease-out);
+}
+
+.row:hover {
+  background: var(--color-primary-tint);
+}
+
+.row:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+}
+
+.row:active {
+  transform: scale(0.995);
+}
+
+.rowActive {
+  background: var(--color-primary-tint);
+}
+
+.rowActive .label {
+  color: var(--color-text-primary);
+  font-weight: var(--weight-semibold);
+}
+
+.rowActive .value {
+  color: var(--color-primary);
+}
+
+.rowActive .fill {
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+  filter: saturate(1.1) brightness(1.05);
+}
+
+.label {
+  font-size: var(--font-sm);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.track {
+  grid-column: 1 / -1;
+  grid-row: 2;
+  height: 14px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.fill {
+  display: block;
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
+  transition:
+    width 0.9s var(--ease-out),
+    filter var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fill {
+    transition: none;
+  }
+}
+
+.value {
+  font-size: var(--font-label);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-muted);
+  text-align: right;
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.controls {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+}
+
+.control {
+  flex: 1;
+  padding: var(--space-2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  color: var(--color-text-secondary);
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  font-family: inherit;
+  cursor: pointer;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out);
+}
+
+.control:hover {
+  border-color: var(--color-primary-light);
+}
+
+.control:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+}
+
+.active {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+}
+
+/* ---------- floating tooltip (portal to body) ---------- */
+.tip {
+  position: fixed;
+  z-index: var(--z-tooltip);
+  max-width: min(280px, calc(100vw - 20px));
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-lg);
+  animation: fadeIn var(--transition-fast) var(--ease-out);
+}
+
+.tipHeader {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.tipRank {
+  flex-shrink: 0;
+  font-size: var(--font-label);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  background: var(--color-primary-tint);
+  padding: 2px 8px;
+  border-radius: var(--radius-full);
+}
+
+.tipName {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+}
+
+.tipDesc {
+  margin: 0 0 var(--space-2);
+  font-size: var(--font-label);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.tipMetric {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.tipMetric strong {
+  font-size: var(--font-h4);
+  letter-spacing: -0.01em;
+  color: var(--color-primary);
+}
+
+.tipMetric span {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.tipNote {
+  margin: 0;
+  padding-top: var(--space-2);
+  border-top: 1px solid var(--color-divider);
+  font-size: var(--font-label);
+  line-height: var(--leading-normal);
+  color: var(--color-text-secondary);
+}
+
+.tipNoteLabel {
+  display: block;
+  margin-bottom: 2px;
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-primary);
+}

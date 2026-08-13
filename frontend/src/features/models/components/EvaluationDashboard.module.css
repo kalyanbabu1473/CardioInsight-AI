@@ -1,0 +1,230 @@
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  width: 100%;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+.modelMetrics {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.modelMetrics h4 {
+  font-size: var(--font-h4);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4);
+}
+
+.tileGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-2);
+}
+
+.tile {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tile strong {
+  font-size: var(--font-h4);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-primary);
+  letter-spacing: -0.01em;
+}
+
+.tile span {
+  font-size: 10px;
+  color: var(--color-text-muted);
+  line-height: var(--leading-tight);
+}
+
+/* confusion matrices */
+.cmWrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.cmWrap h3,
+.figures h3 {
+  font-size: var(--font-h3);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.caption {
+  font-size: var(--font-sm);
+  color: var(--color-text-muted);
+  margin: -var(--space-3) 0 var(--space-2);
+}
+
+.cmPanel2 {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-4);
+}
+
+.cm {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.cm h5 {
+  font-size: var(--font-sm);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-3);
+}
+
+.cmTitles {
+  display: flex;
+  justify-content: flex-end;
+  padding-right: var(--space-2);
+  margin-bottom: var(--space-1);
+}
+
+.cmTitles span {
+  font-size: 10px;
+  color: var(--color-text-muted);
+}
+
+.cmRow {
+  display: flex;
+  gap: var(--space-1);
+  align-items: flex-start;
+}
+
+.actual {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 10px;
+  color: var(--color-text-muted);
+  align-self: center;
+  padding-right: var(--space-1);
+}
+
+.cmGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-1);
+  flex: 1;
+}
+
+.cmCell {
+  border-radius: var(--radius-md);
+  padding: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.cmCell strong {
+  font-size: var(--font-h4);
+  font-weight: var(--weight-extrabold);
+  color: var(--color-text-primary);
+}
+
+.cmCell span {
+  font-size: 9px;
+  color: var(--color-text-muted);
+}
+
+.tp {
+  background: var(--color-success-tint);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+}
+
+.tn {
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+}
+
+.fp {
+  background: var(--color-warning-tint);
+  border: 1px solid rgba(245, 158, 11, 0.25);
+}
+
+.fn {
+  background: var(--color-danger-tint);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+/* figures */
+.figures {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.figureGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-5);
+}
+
+.figure {
+  margin: 0;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4);
+  box-shadow: var(--shadow-sm);
+}
+
+.figure img {
+  width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
+  background: #fff;
+}
+
+.figure figcaption {
+  margin-top: var(--space-3);
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-secondary);
+  text-align: center;
+}
+
+@media (max-width: 1100px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .cmPanel2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 720px) {
+  .tileGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .cmPanel2 {
+    grid-template-columns: 1fr;
+  }
+  .figureGrid {
+    grid-template-columns: 1fr;
+  }
+}

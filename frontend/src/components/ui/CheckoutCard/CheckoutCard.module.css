@@ -1,0 +1,30 @@
+.wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  transform-origin: center;
+}
+
+.text {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--font-label);
+  font-weight: var(--weight-extrabold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary-light);
+  white-space: nowrap;
+  transform-origin: center;
+}
+
+.icon {
+  flex-shrink: 0;
+  transform-origin: center;
+}
+
+.arrow {
+  display: inline-flex;
+  align-items: center;
+  color: var(--color-primary-light);
+}

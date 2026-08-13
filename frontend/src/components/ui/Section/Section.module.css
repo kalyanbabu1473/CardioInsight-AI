@@ -1,0 +1,21 @@
+.section {
+  margin-bottom: var(--gap-card);
+}
+
+.header {
+  margin-bottom: var(--space-5);
+}
+
+.header h2 {
+  font-size: var(--font-h2);
+  font-weight: var(--weight-bold);
+  letter-spacing: -0.01em;
+  color: var(--color-text-primary);
+}
+
+.header p {
+  margin-top: var(--space-2);
+  color: var(--color-text-secondary);
+  font-size: var(--font-body);
+  line-height: var(--leading-normal);
+}

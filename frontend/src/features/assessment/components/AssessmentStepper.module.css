@@ -1,0 +1,161 @@
+.stepper {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  box-shadow: var(--shadow-sm);
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.metaLabel {
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.percent {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-1);
+}
+
+.percentValue {
+  font-size: var(--font-h4);
+  font-weight: var(--weight-bold);
+  color: var(--color-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+.percentLabel {
+  font-size: var(--font-label);
+  color: var(--color-text-muted);
+}
+
+.track {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  overflow-x: auto;
+  padding-bottom: var(--space-2);
+  scrollbar-width: none;
+}
+
+.track::-webkit-scrollbar {
+  display: none;
+}
+
+.item {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  background: none;
+  padding: 0 var(--space-1);
+}
+
+.itemLocked {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.nodeWrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  width: 104px;
+}
+
+.node {
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-surface-alt);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-muted);
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out);
+}
+
+.nodeIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.itemActive .node {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #ffffff;
+  box-shadow: 0 0 0 4px var(--color-primary-tint);
+}
+
+.itemCompleted .node {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.label {
+  font-size: var(--font-label);
+  font-weight: var(--weight-semibold);
+  text-align: center;
+  line-height: var(--leading-tight);
+  color: var(--color-text-muted);
+  transition: color var(--transition-fast) var(--ease-out);
+}
+
+.itemActive .label {
+  color: var(--color-primary);
+}
+
+.itemCompleted .label {
+  color: var(--color-text-secondary);
+}
+
+.connector {
+  flex: 1 1 100%;
+  min-width: 24px;
+  height: 2px;
+  margin-top: 16px;
+  border-radius: var(--radius-full);
+  background: var(--color-divider);
+  transition: background var(--transition-normal) var(--ease-out);
+}
+
+.connectorFilled {
+  background: var(--color-primary);
+}
+
+.progress {
+  margin-top: var(--space-4);
+  height: 4px;
+  border-radius: var(--radius-full);
+  background: var(--color-surface-alt);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  border-radius: var(--radius-full);
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-primary-light)
+  );
+}
