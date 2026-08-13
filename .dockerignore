@@ -19,6 +19,8 @@ research
 Models/*
 !Models/CardioAI_Assessment_Model.pkl
 !Models/CardioAI_Assessment_Features.pkl
+!Models/Random_Forest
+!Models/Random_Forest/Random_Forest_Model.pkl
 
 # The 124 MB downloadable dataset stays in the image by default
 # (INCLUDE_DATASET=true in docker-compose). See DEPLOYMENT.md to slim the image.
