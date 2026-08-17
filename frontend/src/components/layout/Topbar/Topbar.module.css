@@ -177,4 +177,10 @@
     grid-area: search;
     justify-self: stretch;
   }
+
+  .right {
+    grid-area: actions;
+    flex-wrap: nowrap;
+    white-space: nowrap;
+  }
 }
