@@ -35,23 +35,25 @@ function MetricRow({ row }: { row: (typeof modelComparison)[number] }) {
 export default function ModelComparison() {
   return (
     <div>
-      <table className={styles.table}>
-        <thead>
-          <tr>
-            <th>Model</th>
-            <th>Acc</th>
-            <th>Prec</th>
-            <th>Rec</th>
-            <th>F1</th>
-            <th>AUC</th>
-          </tr>
-        </thead>
-        <tbody>
-          {modelComparison.map((row) => (
-            <MetricRow key={row.model} row={row} />
-          ))}
-        </tbody>
-      </table>
+      <div className={styles.scrollWrap}>
+        <table className={styles.table}>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th>Acc</th>
+              <th>Prec</th>
+              <th>Rec</th>
+              <th>F1</th>
+              <th>AUC</th>
+            </tr>
+          </thead>
+          <tbody>
+            {modelComparison.map((row) => (
+              <MetricRow key={row.model} row={row} />
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       <p className={styles.note}>
         Stars (★) mark the best-performing model by ROC-AUC.

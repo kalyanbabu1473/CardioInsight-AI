@@ -1,11 +1,15 @@
-import { Bell, Moon, Sun } from "lucide-react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
 import { useLocation } from "react-router-dom";
 import { useTheme } from "../../../app/useTheme";
 import GlobalSearch from "../GlobalSearch";
 import { routeMeta } from "../../../routes/routeConfig";
 import styles from "./Topbar.module.css";
 
-export default function Topbar() {
+interface TopbarProps {
+  onMenuClick?: () => void;
+}
+
+export default function Topbar({ onMenuClick }: TopbarProps) {
   const { theme, toggleTheme } = useTheme();
   const { pathname } = useLocation();
   const isDark = theme === "dark";
@@ -14,6 +18,15 @@ export default function Topbar() {
 
   return (
     <header className={styles.topbar}>
+      <button
+        type="button"
+        className={styles.menuBtn}
+        onClick={onMenuClick}
+        aria-label="Open navigation menu"
+      >
+        <Menu size={20} />
+      </button>
+
       <div className={styles.left}>
         <div>
           <p className={styles.breadcrumb}>{meta.crumb}</p>

@@ -23,12 +23,29 @@
   overflow-x: hidden;
 }
 
-@media (max-width: 768px) {
+/* Full-screen scrim behind the mobile drawer. Rendered only when open and
+   only below desktop width. */
+.backdrop {
+  display: none;
+}
+
+@media (max-width: 1023px) {
   .main {
     margin-left: 0;
   }
 
   .content {
     padding: var(--space-4);
+  }
+
+  .backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: calc(var(--z-sidebar) - 1);
+    background: rgba(2, 6, 23, 0.55);
+    backdrop-filter: blur(2px);
+    border: none;
+    padding: 0;
   }
 }

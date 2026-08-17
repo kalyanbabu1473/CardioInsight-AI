@@ -1827,4 +1827,7 @@
   .summaryGrid {
     flex-direction: column;
   }
+  .rocLayout {
+    grid-template-columns: 1fr;
+  }
 }

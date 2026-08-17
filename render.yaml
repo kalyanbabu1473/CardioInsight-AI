@@ -1,0 +1,16 @@
+# Render static-site blueprint for the CardioInsight AI frontend.
+# Root causes of blank/404 pages on refresh or deep links to SPA routes
+# (e.g. /assessment) were: missing SPA rewrite fallback and no static site
+# definition. This wires up the build plus a catch-all rewrite to index.html,
+# mirroring the Docker/nginx config already in frontend/nginx.conf.
+services:
+  - type: static
+    name: cardioinsight-frontend
+    runtime: static
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

@@ -195,6 +195,16 @@
   --skeleton-shimmer-high: rgba(255, 255, 255, 0.9);
 }
 
+/* ---------- RESPONSIVE OVERRIDES ---------- */
+
+/* On phones the topbar stacks into two rows (menu/title/actions + search),
+   so the fixed header is taller and Aurora is offset to match. */
+@media (max-width: 767px) {
+  :root {
+    --topbar-height: 116px;
+  }
+}
+
 /* ---------- SHARED KEYFRAMES ---------- */
 @keyframes fadeUp {
   from {

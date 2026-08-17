@@ -21,7 +21,7 @@
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
 }
 
@@ -59,4 +59,18 @@
 .card p {
   color: var(--color-text-secondary);
   line-height: 1.8;
+}
+
+@media (max-width: 640px) {
+  .heading h2 {
+    font-size: var(--font-h2);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+
+  .card {
+    padding: 24px;
+  }
 }

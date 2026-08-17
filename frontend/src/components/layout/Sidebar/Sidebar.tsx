@@ -26,11 +26,16 @@ const navigation = [
   { label: "Settings", path: "/settings", icon: Settings },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onNavigate?: () => void;
+}
+
+export default function Sidebar({ open = false, onNavigate }: SidebarProps) {
   const { hasSessionAssessment } = useAssessment();
 
   return (
-    <aside className={styles.sidebar}>
+    <aside className={[styles.sidebar, open ? styles.open : ""].filter(Boolean).join(" ")}>
       <div className={styles.logo}>
         <h2>CardioInsight AI</h2>
         <span>CVD Risk Intelligence Platform</span>
@@ -46,6 +51,7 @@ export default function Sidebar() {
             <NavLink
               key={item.path}
               to={item.path}
+              onClick={onNavigate}
               className={({ isActive }) =>
                 [
                   styles.link,

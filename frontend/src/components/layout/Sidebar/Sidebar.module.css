@@ -1,6 +1,8 @@
 .sidebar {
   width: var(--sidebar-width);
+  max-width: 84vw;
   height: 100vh;
+  height: 100dvh;
   position: fixed;
   left: 0;
   top: 0;
@@ -13,6 +15,9 @@
   border-right: 1px solid var(--glass-border);
   box-shadow: var(--shadow-md);
   z-index: var(--z-sidebar);
+  transition:
+    transform var(--transition-normal) var(--ease-out),
+    visibility 0s linear var(--transition-normal);
 }
 
 .logo h2 {
@@ -34,6 +39,8 @@
   flex-direction: column;
   gap: var(--space-1);
   margin-top: var(--space-7);
+  overflow-y: auto;
+  min-height: 0;
 }
 
 .link {
@@ -255,8 +262,20 @@
   }
 }
 
-@media (max-width: 768px) {
+/* Below desktop width the sidebar becomes an off-canvas drawer. It is always
+   in the DOM (for the Framer Motion active-glow layout animation) but parked
+   off-screen and non-focusable until the hamburger opens it. */
+@media (max-width: 1023px) {
   .sidebar {
-    display: none;
+    transform: translateX(-100%);
+    visibility: hidden;
+  }
+
+  .sidebar.open {
+    transform: translateX(0);
+    visibility: visible;
+    transition:
+      transform var(--transition-normal) var(--ease-out),
+      visibility 0s;
   }
 }

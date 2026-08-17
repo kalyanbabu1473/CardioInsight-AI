@@ -12,6 +12,14 @@ html{
     scroll-behavior:smooth;
 }
 
+html,
+body,
+#root{
+    width:100%;
+    max-width:100%;
+    overflow-x:hidden;
+}
+
 body{
 
     background:var(--color-background);

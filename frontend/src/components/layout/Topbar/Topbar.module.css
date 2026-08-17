@@ -1,7 +1,8 @@
 .topbar {
   height: var(--topbar-height);
   display: grid;
-  grid-template-columns: 1fr minmax(280px, 560px) 1fr;
+  grid-template-areas: "menu left center right";
+  grid-template-columns: auto minmax(0, 1fr) minmax(280px, 560px) auto;
   align-items: center;
   gap: var(--space-5);
   padding: 0 var(--space-6);
@@ -13,7 +14,47 @@
   z-index: var(--z-topbar);
 }
 
+/* Hamburger that opens the mobile drawer. Hidden on desktop. */
+.menuBtn {
+  display: none;
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  grid-area: menu;
+  place-items: center;
+  border-radius: var(--radius-full);
+  background: var(--input-bg);
+  border: 1px solid var(--input-border);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    box-shadow var(--transition-fast) var(--ease-out),
+    transform var(--transition-fast) var(--ease-out);
+}
+
+.menuBtn:hover {
+  background: var(--color-primary-tint);
+  border-color: var(--color-primary);
+  color: var(--color-primary);
+}
+
+.menuBtn:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-tint);
+}
+
+.menuBtn:active {
+  transform: scale(0.92);
+}
+
 .left {
+  grid-area: left;
   justify-self: start;
   min-width: 0;
 }
@@ -23,6 +64,9 @@
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .breadcrumb {
@@ -34,6 +78,7 @@
 }
 
 .center {
+  grid-area: center;
   justify-self: center;
   width: 100%;
   min-width: 0;
@@ -42,6 +87,7 @@
 }
 
 .right {
+  grid-area: right;
   justify-self: end;
   display: flex;
   align-items: center;
@@ -85,39 +131,50 @@
   transform: scale(0.92);
 }
 
-@media (max-width: 1024px) {
+/* Tablet: single row keeps title + search + actions, now with the menu
+   button added on the left. */
+@media (max-width: 1023px) {
   .topbar {
-    grid-template-columns: 1fr minmax(240px, 400px) 1fr;
+    grid-template-columns: auto minmax(0, 1fr) minmax(200px, 400px) auto;
     gap: var(--space-4);
+  }
+
+  .menuBtn {
+    display: grid;
   }
 }
 
-@media (max-width: 768px) {
+/* Phone: the header stacks into two rows — menu/title/actions on top and a
+   full-width search below. The taller height is reflected by the responsive
+   --topbar-height token so fixed backdrops (Aurora) line up. */
+@media (max-width: 767px) {
   .topbar {
-    grid-template-columns: 1fr minmax(0, 320px) 1fr;
-    padding: 0 var(--space-4);
+    height: auto;
+    min-height: var(--topbar-height);
+    grid-template-areas:
+      "menu title actions"
+      "search search search";
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    grid-template-rows: auto auto;
+    row-gap: var(--space-2);
+    column-gap: var(--space-3);
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .left {
+    grid-area: title;
   }
 
   .left h1 {
     font-size: var(--font-h4);
   }
-}
 
-@media (max-width: 560px) {
-  .topbar {
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "search actions";
-  }
-
-  .left {
-    display: none;
+  .breadcrumb {
+    font-size: 11px;
   }
 
   .center {
     grid-area: search;
-  }
-
-  .right {
-    grid-area: actions;
+    justify-self: stretch;
   }
 }
