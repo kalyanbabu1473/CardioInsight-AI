@@ -1,0 +1,228 @@
+{
+  "model": "Random_Forest_Clinical_18_AdultCompleteCase",
+  "metrics_version": "2.0.0",
+  "calibration": "isotonic",
+  "feature_count": 18,
+  "target": "Composite_CVD (prevalent self-reported CVD)",
+  "training_cohort": "NHANES adults 18-80 with 16 observed clinical features, derived BMI, and deterministic never-smoker skip",
+  "cohort_rows": 3501,
+  "cohort_events": 392,
+  "cohort_prevalence": 0.11196800914024564,
+  "exclusions": {
+    "total_rows": 15457,
+    "excluded_age_outside_18_80": 5867,
+    "excluded_missing_continuous": 6083,
+    "excluded_unknown_category": 6,
+    "excluded_missing_target": 0,
+    "eligible_rows": 3501,
+    "eligible_events": 392
+  },
+  "train_rows": 2800,
+  "train_events": 314,
+  "test_rows": 701,
+  "test_events": 78,
+  "test_prevalence": 0.11126961483594865,
+  "roc_auc": 0.815594517841709,
+  "average_precision": 0.29697381560596714,
+  "brier_raw": 0.09683909027013157,
+  "brier_calibrated": 0.08443584346907464,
+  "log_loss_raw": 0.31740132187173625,
+  "log_loss_calibrated": 0.279137453157911,
+  "high_risk_accuracy": 0.7532097004279601,
+  "high_risk_f1": 0.4054982817869416,
+  "high_risk_mcc": 0.34817406720879607,
+  "risk_thresholds": {
+    "low": 0.05,
+    "high": 0.2
+  },
+  "threshold_metrics": [
+    {
+      "threshold": 0.05,
+      "predicted_positive": 344,
+      "tp": 72,
+      "fp": 272,
+      "tn": 351,
+      "fn": 6,
+      "sensitivity": 0.9230769230769231,
+      "specificity": 0.5634028892455859,
+      "ppv": 0.20930232558139536,
+      "npv": 0.9831932773109243,
+      "f1": 0.3412322274881517,
+      "accuracy": 0.6034236804564908
+    },
+    {
+      "threshold": 0.2,
+      "predicted_positive": 213,
+      "tp": 59,
+      "fp": 154,
+      "tn": 469,
+      "fn": 19,
+      "sensitivity": 0.7564102564102564,
+      "specificity": 0.7528089887640449,
+      "ppv": 0.27699530516431925,
+      "npv": 0.9610655737704918,
+      "f1": 0.40549828178694153,
+      "accuracy": 0.7532097004279601
+    }
+  ],
+  "calibration_fit": {
+    "intercept": 0.06401384466037253,
+    "slope": 1.0759292876070499
+  },
+  "uncertainty": {
+    "iterations_requested": 2000,
+    "iterations_valid": 2000,
+    "roc_auc_95_ci": [
+      0.7716774799760572,
+      0.8573174488427378
+    ],
+    "brier_95_ci": [
+      0.07074504515754776,
+      0.09901819892723591
+    ],
+    "average_precision_95_ci": [
+      0.22695164120967942,
+      0.3767737514579283
+    ]
+  },
+  "subgroups": [
+    {
+      "group": "sex:Male",
+      "n": 356,
+      "events": 53,
+      "non_events": 303,
+      "prevalence": 0.14887640449438203,
+      "roc_auc": 0.7997073292234884,
+      "brier": 0.1075538272806965,
+      "reliable": true,
+      "uncertainty": {
+        "iterations_requested": 2000,
+        "iterations_valid": 2000,
+        "roc_auc_95_ci": [
+          0.7414251702648197,
+          0.8519933592275509
+        ],
+        "brier_95_ci": [
+          0.0876865579203943,
+          0.13003745415582815
+        ],
+        "average_precision_95_ci": [
+          0.24725443717098863,
+          0.4355181395139212
+        ]
+      },
+      "note": "AUC/Brier reported; uncertainty estimated by bootstrap."
+    },
+    {
+      "group": "sex:Female",
+      "n": 345,
+      "events": 25,
+      "non_events": 320,
+      "prevalence": 0.07246376811594203,
+      "roc_auc": 0.816125,
+      "brier": 0.06058076452143004,
+      "reliable": true,
+      "uncertainty": {
+        "iterations_requested": 2000,
+        "iterations_valid": 2000,
+        "roc_auc_95_ci": [
+          0.7280038632582887,
+          0.893731809349919
+        ],
+        "brier_95_ci": [
+          0.04405719454947903,
+          0.07770495138997836
+        ],
+        "average_precision_95_ci": [
+          0.1395572283505209,
+          0.3911120425642524
+        ]
+      },
+      "note": "AUC/Brier reported; uncertainty estimated by bootstrap."
+    },
+    {
+      "group": "age:18-39",
+      "n": 233,
+      "events": 2,
+      "non_events": 231,
+      "prevalence": 0.008583690987124463,
+      "roc_auc": 0.6525974025974026,
+      "brier": 0.008281295565814386,
+      "reliable": false,
+      "uncertainty": null,
+      "note": "Too few events or non-events for a reliable subgroup estimate."
+    },
+    {
+      "group": "age:40-59",
+      "n": 231,
+      "events": 25,
+      "non_events": 206,
+      "prevalence": 0.10822510822510822,
+      "roc_auc": 0.7694174757281553,
+      "brier": 0.0846975284788935,
+      "reliable": true,
+      "uncertainty": {
+        "iterations_requested": 2000,
+        "iterations_valid": 2000,
+        "roc_auc_95_ci": [
+          0.6505523334414882,
+          0.8716938197404435
+        ],
+        "brier_95_ci": [
+          0.05818542056076524,
+          0.11402388802957333
+        ],
+        "average_precision_95_ci": [
+          0.18077906143154926,
+          0.4811365220669636
+        ]
+      },
+      "note": "AUC/Brier reported; uncertainty estimated by bootstrap."
+    },
+    {
+      "group": "age:60-80",
+      "n": 237,
+      "events": 51,
+      "non_events": 186,
+      "prevalence": 0.21518987341772153,
+      "roc_auc": 0.6618174151380982,
+      "brier": 0.159050022474102,
+      "reliable": true,
+      "uncertainty": {
+        "iterations_requested": 2000,
+        "iterations_valid": 2000,
+        "roc_auc_95_ci": [
+          0.5830228455739779,
+          0.7394514019062967
+        ],
+        "brier_95_ci": [
+          0.13257696528479693,
+          0.18730017940986593
+        ],
+        "average_precision_95_ci": [
+          0.22660743035369696,
+          0.4148385565102454
+        ]
+      },
+      "note": "AUC/Brier reported; uncertainty estimated by bootstrap."
+    }
+  ],
+  "split": {
+    "method": "stratified random 80/20",
+    "test_size": 0.2,
+    "random_state": 42
+  },
+  "seed": 42,
+  "dataset_sha256": "942ded50b3a23d95dbb9cfb2d0107779f4e1f23c14d35b1e0db295047410734b",
+  "preprocessing": {
+    "version": "1.0.0",
+    "age_range": [
+      18.0,
+      80.0
+    ],
+    "continuous_imputation": "none (complete-case)",
+    "bmi": "height/weight derived, rounded to 4 decimals",
+    "smoking": "SMQ020=No -> SMQ040=3 structural skip; SMQ020=Yes requires an observed SMQ040 code in {1,2,3}",
+    "unknown_categories": "excluded, not mapped"
+  }
+}

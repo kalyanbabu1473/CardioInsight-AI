@@ -1,7 +1,8 @@
 """Generate frontend/src/data/assessment/featureContract.generated.ts from feature_contract.json.
 
 Single source of truth is feature_contract.json at the repository root.
-Run: python scripts/sync_feature_contract_frontend.py
+Run: python backend/scripts/sync_feature_contract_frontend.py
+Check without writing: python backend/scripts/sync_feature_contract_frontend.py --check
 """
 
 import json
@@ -135,8 +136,16 @@ def build() -> str:
 
 
 def main() -> None:
+    expected = build()
+    if "--check" in sys.argv:
+        current = OUT.read_text(encoding="utf-8") if OUT.is_file() else None
+        if current != expected:
+            print(f"Out of sync: {OUT}")
+            raise SystemExit(1)
+        print(f"In sync: {OUT}")
+        return
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    OUT.write_text(build(), encoding="utf-8")
+    OUT.write_text(expected, encoding="utf-8")
     count = len(json.loads(CONTRACT.read_text(encoding="utf-8"))["features"])
     print(f"Wrote {OUT} ({count} features)")
 

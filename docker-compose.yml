@@ -26,6 +26,8 @@ services:
       args:
         # Set to false to drop the 124 MB dataset from the image.
         INCLUDE_DATASET: "true"
+        # Browser calls /api, which nginx proxies to the backend service.
+        VITE_API_BASE_URL: "/api"
     ports:
       - "3000:80"
     depends_on:

@@ -1,6 +1,14 @@
 """Unit tests for model diagnostics (unavailability must never be silent)."""
 
-from app.ml.model_loader import is_lfs_pointer, model_diagnostics, model_unavailable_reason
+from sklearn.isotonic import IsotonicRegression
+
+from app.ml.model_loader import (
+    _calibrator_smoke_error,
+    is_lfs_pointer,
+    model_diagnostics,
+    model_ready,
+    model_unavailable_reason,
+)
 
 
 def test_is_lfs_pointer_detects_pointer_stub(tmp_path):
@@ -34,3 +42,40 @@ def test_model_unavailable_reason_ready_with_shipped_model(monkeypatch):
 
     monkeypatch.setattr(model_loader, "model_path", default_path)
     assert model_unavailable_reason() is None
+
+
+def test_calibrator_smoke_rejects_objects_without_predict():
+    assert _calibrator_smoke_error(object()) is not None
+
+
+def test_calibrator_smoke_rejects_unfitted_isotonic():
+    error = _calibrator_smoke_error(IsotonicRegression())
+    assert error is not None
+
+
+def test_calibrator_smoke_accepts_fitted_isotonic():
+    calibrator = IsotonicRegression(out_of_bounds="clip").fit(
+        [0.0, 0.2, 0.5, 0.8, 1.0],
+        [0.0, 0.1, 0.3, 0.7, 1.0],
+    )
+    assert _calibrator_smoke_error(calibrator) is None
+
+
+def test_diagnostics_expose_calibrator_smoke_and_model_metadata():
+    diag = model_diagnostics()
+    assert diag["loaded_model_type"] == "RandomForestClassifier"
+    assert diag["has_predict_proba"] is True
+    assert diag["model_classes"] == [0, 1]
+    assert diag["calibrator_type"] == "IsotonicRegression"
+    assert diag["calibrator_smoke_ok"] is True
+    assert diag["calibrator_smoke_error"] is None
+    assert diag["contract_order_match"] is True
+
+
+def test_model_ready_is_false_for_unusable_calibrator(monkeypatch):
+    from app.ml import model_loader
+
+    monkeypatch.setattr(
+        model_loader, "load_calibrator", lambda: IsotonicRegression()
+    )
+    assert model_ready() is False

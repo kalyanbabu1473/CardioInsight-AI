@@ -2,7 +2,7 @@
  * Report service — pure helpers for rendering and exporting clinical reports
  * built from an AssessmentResult.
  *
- * Input rendering is contract-driven: the 44 features come straight from the
+ * Input rendering is contract-driven: the 18 clinical features come straight from the
  * feature contract (labels, units, derived BMI), so a report always reflects
  * exactly what the model consumed. Records created by the older 20-feature
  * build are detected (`legacy`) and rendered from their flat input instead.
@@ -37,6 +37,26 @@ export function formatPercent(ratio: number, digits = 1): string {
   return `${(ratio * 100).toFixed(digits)}%`;
 }
 
+/** Normalize current 0-100 certainty and legacy 0-1 records to percent. */
+export function certaintyPercent(value: number): number {
+  return value <= 1 ? value * 100 : value;
+}
+
+/** Format prediction certainty without double-converting the percentage. */
+export function formatCertainty(value: number, digits = 0): string {
+  return `${certaintyPercent(value).toFixed(digits)}%`;
+}
+
+/** Escape untrusted text before interpolating it into report HTML. */
+export function escapeHtml(value: unknown): string {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 /* ------------------------------------------------------------------ */
 /*  Input value helpers                                                */
 /* ------------------------------------------------------------------ */
@@ -45,7 +65,7 @@ export function isLegacyAssessment(assessment: AssessmentResult): boolean {
   return assessment.legacy === true;
 }
 
-/** Ordered clinical rows for a current (44-feature) assessment input. */
+/** Ordered clinical rows for a current (18-feature) assessment input. */
 function currentFeatureRows(input: AssessmentInput): { label: string; value: string }[] {
   const rows: { label: string; value: string }[] = [];
   for (const name of FEATURE_ORDER) {
@@ -105,6 +125,7 @@ export function patientInfo(assessment: AssessmentResult) {
   const bmi = calculateBmi(input.bodyComposition.heightCm, input.bodyComposition.weightKg);
   return [
     { label: "Age", value: `${input.demographics.age} years` },
+    { label: "Sex", value: input.demographics.sex },
     { label: "Height", value: `${input.bodyComposition.heightCm} cm` },
     { label: "Weight", value: `${input.bodyComposition.weightKg} kg` },
     {
@@ -140,7 +161,7 @@ export function buildReportText(assessment: AssessmentResult): string {
     "Risk Summary",
     `  Risk Probability: ${formatPercent(result.probability)}`,
     `  Risk Classification: ${result.level}`,
-    `  Confidence Score: ${formatPercent(result.confidence, 0)}`,
+    `  Prediction Certainty: ${formatCertainty(result.confidence)} (max(p, 1-p) * 100; not probability the prediction is correct)`,
     "",
     "Clinical Interpretation",
     `  ${result.interpretation}`,
@@ -172,16 +193,19 @@ export function buildReportHtml(assessment: AssessmentResult): string {
   const { result, model } = assessment;
 
   const htmlInputRows = inputRows(assessment.input)
-    .map((r) => `<tr><th>${r.label}</th><td>${r.value}</td></tr>`)
+    .map(
+      (r) =>
+        `<tr><th>${escapeHtml(r.label)}</th><td>${escapeHtml(r.value)}</td></tr>`,
+    )
     .join("");
 
   const list = (items: string[]) =>
-    items.map((item) => `<li>${item}</li>`).join("");
+    items.map((item) => `<li>${escapeHtml(item)}</li>`).join("");
 
   const factorRows = result.topFactors
     .map(
       (f) =>
-        `<tr><td>${f.name}</td><td>${f.value}</td><td>${
+        `<tr><td>${escapeHtml(f.name)}</td><td>${escapeHtml(f.value)}</td><td>${
           f.contribution >= 0 ? "+" : ""
         }${(f.contribution * 100).toFixed(1)}%</td></tr>`,
     )
@@ -191,7 +215,7 @@ export function buildReportHtml(assessment: AssessmentResult): string {
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>${assessment.id} — Clinical Report</title>
+    <title>${escapeHtml(assessment.id)} - Clinical Report</title>
     <style>
       @page { size: A4 portrait; margin: 18mm 16mm 14mm 16mm; }
       * { box-sizing: border-box; }
@@ -227,24 +251,25 @@ export function buildReportHtml(assessment: AssessmentResult): string {
     <div class="head">
       <div class="brand">
         <div class="logo">CardioInsight <span>AI</span></div>
-        <div class="model">Model: ${model}</div>
+        <div class="model">Model: ${escapeHtml(model)}</div>
       </div>
       <h1>Project: Cardiovascular Disease Risk Assessment</h1>
       <div class="meta">
-        Assessment ID: <b>${assessment.id}</b> &middot; Date &amp; Time: <b>${formatDateTime(assessment.createdAt)}</b>
+        Assessment ID: <b>${escapeHtml(assessment.id)}</b> &middot; Date &amp; Time: <b>${escapeHtml(formatDateTime(assessment.createdAt))}</b>
       </div>
     </div>
 
     <h2>Risk Summary</h2>
     <div class="summary">
       <div class="stat"><strong>${formatPercent(result.probability)}</strong><span>Predicted CVD Risk</span></div>
-      <div class="stat"><strong>${result.level}</strong><span>Risk Category</span></div>
-      <div class="stat"><strong>${formatPercent(result.confidence, 0)}</strong><span>Confidence Score</span></div>
+      <div class="stat"><strong>${escapeHtml(result.level)}</strong><span>Risk Category</span></div>
+      <div class="stat"><strong>${formatCertainty(result.confidence)}</strong><span>Prediction Certainty</span></div>
     </div>
-    <p class="note">${result.interpretation}</p>
+    <p class="note">${escapeHtml(result.interpretation)}</p>
+    <p class="note">Prediction certainty is max(p, 1-p) * 100 for the calibrated CVD probability p. It is not the probability that the prediction is correct and not a measure of diagnostic accuracy.</p>
 
     <h2>Clinical Measurements</h2>
-    <table>${htmlInputRows || "<tr><td>—</td></tr>"}</table>
+    <table>${htmlInputRows || "<tr><td>Not recorded</td></tr>"}</table>
 
     <h2>Feature Attribution (SHAP)</h2>
     <table>
@@ -309,9 +334,9 @@ export function downloadCsv(assessment: AssessmentResult) {
     assessment_id: assessment.id,
     created_at: assessment.createdAt,
     model: assessment.model,
-    risk_probability: result.probability,
+    risk_probability_percent: Number((result.probability * 100).toFixed(1)),
     risk_level: result.level,
-    confidence: result.confidence,
+    prediction_certainty_percent: Number(certaintyPercent(result.confidence).toFixed(1)),
     top_factors: result.topFactors.map((f) => f.name).join("; "),
   };
   rows.forEach((row, index) => {

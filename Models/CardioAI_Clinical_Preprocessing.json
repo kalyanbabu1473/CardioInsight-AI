@@ -1,0 +1,55 @@
+{
+  "version": "1.0.0",
+  "shared_module": "backend/app/ml/preprocessing.py",
+  "age_range": [
+    18.0,
+    80.0
+  ],
+  "complete_case": true,
+  "continuous_imputation": "none",
+  "bmi": {
+    "formula": "weight_kg / (height_cm / 100) ** 2",
+    "rounding_decimals": 4,
+    "source_column": "BMXBMI (recorded NHANES field) is not used"
+  },
+  "smoking": {
+    "rule": "SMQ020=2 -> SMQ040=3",
+    "reason": "NHANES structural skip for never smokers",
+    "ever_smoker_codes": [
+      1,
+      2
+    ],
+    "current_smoker_codes": [
+      1,
+      2,
+      3
+    ]
+  },
+  "unknown_categories": "excluded",
+  "excluded_codes": {
+    "BPQ020": [
+      7,
+      8,
+      9
+    ],
+    "SMQ020": [
+      7,
+      8,
+      9
+    ],
+    "SMQ040": [
+      7,
+      8,
+      9
+    ]
+  },
+  "cohort": {
+    "total_rows": 15457,
+    "excluded_age_outside_18_80": 5867,
+    "excluded_missing_continuous": 6083,
+    "excluded_unknown_category": 6,
+    "excluded_missing_target": 0,
+    "eligible_rows": 3501,
+    "eligible_events": 392
+  }
+}

@@ -9,7 +9,7 @@
  *   - `frontend/.env.production`   → deployed backend (Render)
  *
  * The `/api` prefix is appended here, so all existing routes continue to
- * resolve as `/api/assessments`, `/api/assessments/latest`, `/api/predict`.
+ * resolve as `/api/assessments` and `/api/assessments/latest`.
  *
  * When `VITE_API_BASE_URL` is unset it defaults to the relative `/api` path,
  * which the Vite dev server proxies to the local backend (see

@@ -10,29 +10,17 @@ that verify a healthy stack.
 
 ```
  Browser
-   │  (Vite dev server :5173  |  nginx :80/:3000 in production)
-   ▼
+   |  (Vite dev server :5173  |  nginx :80/:3000 in production)
+   v
  Frontend (React SPA)
-   │  POST /api/predict             (ML inference)
-   │  POST/GET /api/assessments     (process-local history, no database)
-   ▼
+   |  POST /api/assessments     (server prediction + process-local history)
+   |  POST /api/predict         (optional direct inference)
+   v
  Backend (FastAPI :8000)
-   ├─ ml/        loads Models/Random_Forest/Random_Forest_Model.pkl + contract
-   ├─ api/       /api/predict, /api/assessments, /api/health
-   └─ services/  in-memory assessment history (cleared on restart)
+   +-- ml/        manifest-verified model + calibrator + preprocessing + contract
+   +-- api/       /api/predict, /api/assessments, /api/health
+   +-- services/  server result builder + in-memory history (cleared on restart)
 ```
-
-- The **prediction is authoritative**: the frontend calls `POST /api/predict`
-  and displays whatever probability/level/confidence the backend returns. It
-  never overrides those numbers locally.
-- There is **no database** (no Supabase, PostgreSQL, SQLAlchemy, or SQLite)
-  and no offline heuristic fallback. If the ML service is unreachable the
-  assessment is refused rather than approximated.
-- The ML model is the **Random Forest (Composite CVD — 44 features)**, driven by
-  `feature_contract.json`. Risk thresholds: `p < 0.30` Low,
-  `0.30 ≤ p < 0.70` Moderate, `p ≥ 0.70` High.
-- Reports (Print, PDF, JSON, CSV) are generated in the browser from the
-  assessment returned by the API, so they require no server-side storage.
 
 ### Assessment history limitation
 
@@ -42,6 +30,71 @@ multiple worker processes). The current assessment is returned directly by
 `POST /api/assessments`, so the Reports page and all downloads continue to work
 for the assessment just submitted. If durable history is required later, it
 would need an external persistence service — intentionally not added here.
+
+### Model limitations and validation status
+
+The shipped model is not externally validated and is not a clinical diagnostic
+device. It predicts **prevalent self-reported CVD** from `MCQ160B`-`MCQ160F`,
+not incident CVD or future risk. Its held-out evaluation is a single stratified
+split of the adult complete-case NHANES-derived cohort:
+
+| Cohort | n | Events | AUC | Brier |
+| --- | ---: | ---: | ---: | ---: |
+| Overall test split | 701 | 78 | 0.8156 | 0.0844 |
+| Male | 356 | 53 | 0.7997 | 0.1076 |
+| Female | 345 | 25 | 0.8161 | 0.0606 |
+| Age 18-39 | 233 | 2 | 0.6526 | 0.0083 |
+| Age 40-59 | 231 | 25 | 0.7694 | 0.0847 |
+| Age 60-80 | 237 | 51 | 0.6618 | 0.1591 |
+
+The overall AUC 95% bootstrap CI is `0.7717-0.8573`, average precision is
+`0.2970` (95% CI `0.2270-0.3768`), and the Brier score is `0.0844` (95% CI
+`0.0707-0.0990`). Calibration intercept is `0.0640` and slope `1.0759`.
+Average precision is more informative than AUC at this 11.2% prevalence.
+
+At the 20% high-risk threshold, overall sensitivity is `0.756`, specificity
+`0.753`, PPV `0.277`, and NPV `0.961` (TP 59, FP 154, TN 469, FN 19). At the 5%
+threshold, sensitivity is `0.923` and specificity `0.563`. These are
+screening-style estimates, not diagnostic certainty; a high-risk result
+requires clinical confirmation.
+
+The age 18-39 subgroup has only **two events**, so its AUC is not reliable.
+No subgroup result should be interpreted as evidence of fairness or equivalent
+performance. The cohort contains no participants under 18 or over 80.
+
+Training and live inference now share `app.ml.preprocessing`:
+
+- BMI is derived from height and weight and rounded to four decimals in both
+  paths. The recorded `BMXBMI` column is not used.
+- The cohort is complete-case. Rows flagged as imputed for observed features or
+  missing continuous values are excluded; no continuous value is imputed.
+- Never-smokers (`SMQ020=2`) use the NHANES structural skip value `SMQ040=3`.
+  Ever-smokers require an observed `SMQ040` in `{1,2,3}`.
+- Refused/unknown categorical codes are excluded, never mapped to a substantive
+  answer.
+
+Retraining and independent validation are still required before any clinical
+use. The previous parity-broken artifacts are preserved at
+`Models/archive/pre_parity_remediation_20261024_223015`; do not deploy them.
+
+### Assessment API integrity
+
+`POST /api/assessments` requires structured `AssessmentInput` and computes the
+result server-side with the deployed model. A caller cannot persist an arbitrary
+probability, level, factors, or recommendations; those fields are ignored if
+present. Legacy flat request bodies are rejected with `422`. The endpoint still
+has no authentication or rate limiting, so do not expose it as a public
+clinical service without adding those controls.
+
+### Artifact integrity
+
+At startup and on model load, the backend verifies
+`Models/CardioAI_Clinical_Manifest.json` against SHA-256 hashes and byte sizes
+for the model, calibrator, features, contract, preprocessing metadata, and
+metrics. It also checks the 18-feature order and that preprocessing is marked
+complete-case. A mismatch makes the model unavailable and health checks return
+`503`. The manifest detects accidental corruption or partial deployment; it is
+not a signature and does not stop an attacker who can rewrite every artifact.
 
 ---
 
@@ -65,11 +118,16 @@ Invoke-RestMethod http://127.0.0.1:8000/api/predict/status # ready: true
 ```
 
 The model artifacts must exist at
-`Models/Random_Forest/Random_Forest_Model.pkl` and
-`Models/CardioAI_Assessment_Features.pkl`, with the contract at
+`Models/CardioAI_Clinical_Model.pkl`,
+`Models/CardioAI_Clinical_Calibrator.pkl`,
+`Models/CardioAI_Clinical_Features.pkl`,
+`Models/CardioAI_Clinical_Preprocessing.json`,
+`Models/CardioAI_Clinical_Metrics.json`, and
+`Models/CardioAI_Clinical_Manifest.json`, with the contract at
 `feature_contract.json` (the defaults). Override via the `ML_MODEL_PATH`,
-`ML_FEATURES_PATH`, and `ML_CONTRACT_PATH` environment variables or
-`backend/.env`.
+`ML_CALIBRATOR_PATH`, `ML_FEATURES_PATH`, `ML_CONTRACT_PATH`,
+`ML_PREPROCESSING_PATH`, `ML_METRICS_PATH`, and `ML_MANIFEST_PATH`
+environment variables or `backend/.env`.
 
 No database environment variables are read.
 
@@ -86,11 +144,20 @@ npm run dev            # http://localhost:5173, proxies /api -> :8000
 ```powershell
 cd backend
 python -m pytest tests -q
+
+cd ..\frontend
+npm test
+npm run lint
+npm run build
 ```
 
-Coverage: health (model status, no DB), assessment create/list/get/latest
-without a database, prediction happy path, determinism, and validation
-(range + enum + missing-section rejection).
+Backend coverage includes model/calibrator/contract artifacts, manifest hash
+verification and fail-closed loading, shared preprocessing/parity, input
+boundaries, smoking consistency, non-finite JSON handling, direct
+model/calibrator/predict math, SHAP additivity, diagnostics, server-owned
+assessment results, persistence, and concurrent requests. Frontend coverage
+includes BMI rounding/validation, smoking consistency, server-result-only
+persistence, and report HTML escaping.
 
 ### Production build
 
@@ -129,7 +196,9 @@ docker compose build --build-arg INCLUDE_DATASET=false frontend
 - **Health check path:** `/api/health`
 - **Required environment variables:** none for the database. The model paths
   default to the repository layout; optionally set `ML_MODEL_PATH`,
-  `ML_CONTRACT_PATH`, `ML_FEATURES_PATH`, and `ALLOWED_ORIGINS`.
+  `ML_CALIBRATOR_PATH`, `ML_CONTRACT_PATH`, `ML_FEATURES_PATH`,
+  `ML_PREPROCESSING_PATH`, `ML_METRICS_PATH`, `ML_MANIFEST_PATH`, and
+  `ALLOWED_ORIGINS`.
 - **Remove** `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
   `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL`, `PGHOST`, `PGPORT`, `PGUSER`,
   `PGPASSWORD`, `PGDATABASE`, and any other database credentials from the
@@ -151,9 +220,13 @@ The frontend is served by the existing Render static site
 
 | Variable            | Default                                          | Purpose                                   |
 | ------------------- | ------------------------------------------------ | ----------------------------------------- |
-| `ML_MODEL_PATH`     | `Models/Random_Forest/Random_Forest_Model.pkl`   | Path to the deployment Random Forest      |
-| `ML_FEATURES_PATH`  | `Models/CardioAI_Assessment_Features.pkl`        | Fallback ordered feature list             |
-| `ML_CONTRACT_PATH`  | `feature_contract.json`                          | Canonical 44-feature contract             |
+| `ML_MODEL_PATH`      | `Models/CardioAI_Clinical_Model.pkl`             | Path to the deployment Random Forest      |
+| `ML_CALIBRATOR_PATH` | `Models/CardioAI_Clinical_Calibrator.pkl`        | Isotonic probability calibrator           |
+| `ML_FEATURES_PATH`   | `Models/CardioAI_Clinical_Features.pkl`          | Fallback ordered feature list             |
+| `ML_CONTRACT_PATH`   | `feature_contract.json`                          | Canonical 18-feature clinical contract    |
+| `ML_PREPROCESSING_PATH` | `Models/CardioAI_Clinical_Preprocessing.json` | Shared training/inference preprocessing metadata |
+| `ML_METRICS_PATH`    | `Models/CardioAI_Clinical_Metrics.json`          | Stored held-out metrics and thresholds    |
+| `ML_MANIFEST_PATH`   | `Models/CardioAI_Clinical_Manifest.json`         | SHA-256 manifest verified on model load   |
 | `ALLOWED_ORIGINS`   | localhost:5173/3000 + production frontend        | CORS origins (comma-separated)            |
 | `HOST`/`PORT`       | `127.0.0.1`/`8000`                               | uvicorn bind address                      |
 | `ENVIRONMENT`       | `development`                                    | `development` / `production`              |
@@ -166,12 +239,15 @@ There is deliberately **no** `DATABASE_URL` or database configuration.
 
 `.github/workflows/ci.yml` runs on every push/PR:
 
-- frontend: `npm ci` → `oxlint` → `npm run build`
-- backend: `pip install -r backend/requirements.txt` → `pytest tests`
+- frontend: `npm ci` -> `oxlint` -> `npm test` -> `npm run build`
+- backend: `pip install -r backend/requirements.txt` -> contract-sync check ->
+  `verify_model.py` (including manifest) -> `pytest tests`
 
-Both jobs need the deployment model artifacts present in the repository
-(negated in `.gitignore`). Since the model is large, track it with **Git LFS**
-so CI can `actions/checkout@v4` it normally.
+Both jobs need the deployment artifacts present in the repository (negated in
+`.gitignore`). The 21.8 MB model is tracked with **Git LFS**; the calibrator,
+feature list, preprocessing metadata, metrics, and manifest are small tracked
+files. CI verifies the manifest, feature order, calibrator, and model before
+running the backend suite.
 
 ---
 
@@ -192,12 +268,15 @@ is performed.
 
 ## API
 
-- `POST /api/predict` — body `{"input": {AssessmentInput}}`, returns
+- `POST /api/predict` - body `{"input": {AssessmentInput}}`, returns
   `{model, probability, level, confidence, feature_names, feature_values,
   expected_value, contributions}`.
   `422` for out-of-range/invalid values, `503` when the model is unavailable.
-- `POST /api/assessments` — stores a record in process memory; returns it with
-  the server sequential id `CI-YYYYMMDD-NNNN`.
+- `POST /api/assessments` - body `{"input": {AssessmentInput}}`. Runs the model,
+  constructs the result server-side, stores the record in process memory, and
+  returns it with the server sequential id `CI-YYYYMMDD-NNNN`. Client-supplied
+  results are ignored; legacy flat bodies return `422`; unavailable model returns
+  `503`.
 - `GET /api/assessments`, `GET /api/assessments/latest`,
   `GET /api/assessments/{id}`.
 - `GET /api/health`, `GET /health`.

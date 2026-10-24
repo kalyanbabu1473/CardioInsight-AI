@@ -8,6 +8,10 @@
 # dataset page will then show no download link as documented in DEPLOYMENT.md.
 FROM node:20-alpine AS build
 ARG INCLUDE_DATASET=true
+# Keep browser API calls same-origin so nginx can proxy /api to the backend.
+# Override only when the image must call a separate backend origin directly.
+ARG VITE_API_BASE_URL=/api
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 WORKDIR /app
 COPY frontend/package.json frontend/package-lock.json* ./
 RUN npm ci --no-audit --no-fund

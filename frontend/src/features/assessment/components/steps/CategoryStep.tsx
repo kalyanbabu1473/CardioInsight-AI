@@ -117,6 +117,7 @@ export default function CategoryStep({
                   </span>
                 }
                 hint={spec.notes}
+                error={errors[spec.name]}
               />
             );
           }

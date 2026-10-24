@@ -3,13 +3,9 @@ import {
   Dumbbell,
   FlaskConical,
   HeartPulse,
-  Landmark,
   Microscope,
   Ruler,
-  ShieldAlert,
-  TestTube,
   User,
-  VenetianMask,
   type LucideIcon,
 } from "lucide-react";
 
@@ -24,7 +20,7 @@ export interface WizardStepDef {
   category?: CategoryKey;
 }
 
-export const REVIEW_STEP = 12;
+export const REVIEW_STEP = 7;
 
 export const WIZARD_STEPS: WizardStepDef[] = [
   {
@@ -64,45 +60,10 @@ export const WIZARD_STEPS: WizardStepDef[] = [
   },
   {
     index: 6,
-    label: CATEGORY_LABELS.environmentalToxins,
-    description: "Heavy metals in blood and urine",
-    icon: ShieldAlert,
-    category: "environmentalToxins",
-  },
-  {
-    index: 7,
-    label: CATEGORY_LABELS.pfas,
-    description: "Persistent organic pollutants",
-    icon: TestTube,
-    category: "pfas",
-  },
-  {
-    index: 8,
-    label: CATEGORY_LABELS.urinaryOpes,
-    description: "Flame-retardant metabolites",
-    icon: TestTube,
-    category: "urinaryOpes",
-  },
-  {
-    index: 9,
-    label: CATEGORY_LABELS.medicalHistory,
-    description: "Diagnoses and medication",
-    icon: VenetianMask,
-    category: "medicalHistory",
-  },
-  {
-    index: 10,
     label: CATEGORY_LABELS.lifestyle,
     description: "Behavioral risk factors",
     icon: Dumbbell,
     category: "lifestyle",
-  },
-  {
-    index: 11,
-    label: CATEGORY_LABELS.socioeconomic,
-    description: "Income context",
-    icon: Landmark,
-    category: "socioeconomic",
   },
   {
     index: REVIEW_STEP,

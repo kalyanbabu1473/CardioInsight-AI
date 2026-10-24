@@ -1,29 +1,37 @@
-"""Prediction service — runs the production model and returns a safe answer.
+"""Prediction service - runs the production model and returns a safe answer.
 
-The service owns risk categorization (thresholds from notebook 13), the
-confidence definition, and sanitization so routers never leak stack traces or
-filesystem details to clients.
+The service owns risk categorization, the confidence definition, and
+sanitization so routers never leak stack traces or filesystem details to
+clients.
 
-The feature vector is built strictly from the feature contract (44 features, the
-model's exact training order). No imputation, no defaults, no fabricated
-values — if any feature is absent the schema rejects the request before this
-service runs.
+The feature vector is built strictly from the feature contract (18 clinical
+features, the model's exact training order). No imputation, no defaults, no
+fabricated values - if any feature is absent the schema rejects the request
+before this service runs.
 
-For each prediction the service also computes exact per-feature TreeSHAP values
-(``shap.TreeExplainer`` on the deployed ensemble) so the clinical report shows
-real model attribution, not a heuristic approximation.
+The deployed Random Forest's raw probability is calibrated with an isotonic
+regressor fitted on out-of-fold training predictions. Rounded calibrated
+probabilities drive the reported risk level and confidence. TreeSHAP values
+explain the underlying forest score, so the raw probability is returned
+alongside the calibrated one for transparency.
 """
 
 import logging
+import math
 from functools import lru_cache
 
 import numpy as np
 import pandas as pd
 import shap
 
-from app.core.feature_contract import feature_order, load_contract
+from app.core.feature_contract import (
+    calibration_method,
+    feature_order,
+    load_contract,
+    risk_thresholds,
+)
 from app.ml.feature_mapper import to_model_row
-from app.ml.model_loader import load_feature_names, load_model
+from app.ml.model_loader import load_calibrator, load_feature_names, load_model
 from app.schemas.prediction import (
     AssessmentInput,
     FeatureContribution,
@@ -32,8 +40,7 @@ from app.schemas.prediction import (
 
 logger = logging.getLogger("cardioinsight.ml")
 
-# Display name for the deployed model (the real research consensus model).
-MODEL_NAME = "Random Forest (Composite CVD — 44 features)"
+MODEL_NAME = "Random Forest (Clinical CVD - 18 features)"
 
 FEATURE_ORDER = feature_order()
 _SPECS = {f["name"]: f for f in load_contract()["features"]}
@@ -41,30 +48,40 @@ _SPECS = {f["name"]: f for f in load_contract()["features"]}
 
 @lru_cache(maxsize=1)
 def _explainer():
-    """Cached TreeExplainer built from the deployed ensemble.
-
-    TreeSHAP is exact for tree ensembles and needs no background dataset, so the
-    contributions below are the authoritative per-feature attributions of the
-    production model itself.
-    """
+    """Cached TreeExplainer built from the deployed ensemble."""
     return shap.TreeExplainer(load_model())
 
 
-def _confidence(prob: float) -> float:
-    """Confidence in the prediction toward the positive class.
+def _calibrate(raw_prob: float) -> float:
+    """Map a raw forest probability through the fitted isotonic calibrator."""
+    if not math.isfinite(raw_prob) or not 0.0 <= raw_prob <= 1.0:
+        raise ValueError("Raw model probability is not finite or in [0, 1].")
+    calibrated = np.asarray(load_calibrator().predict([raw_prob])).reshape(-1)[0]
+    calibrated = float(np.clip(calibrated, 0.0, 1.0))
+    if not math.isfinite(calibrated) or not 0.0 <= calibrated <= 1.0:
+        raise ValueError("Calibrator returned a non-finite or out-of-range value.")
+    return calibrated
 
-    Uses the model's returned probability distance from 0.5 scaled to 0-1: the
-    farther the ensemble probability is from an even split, the more confident
-    the prediction.
+
+def _confidence(prob: float) -> float:
+    """Prediction certainty as a percentage.
+
+    For calibrated CVD probability ``p`` this is ``max(p, 1 - p) * 100``: a
+    0.08 CVD probability means 92% certainty in the assigned binary outcome.
+    It is the maximum calibrated class probability, not the probability that
+    the prediction is correct and not a measure of diagnostic accuracy.
     """
-    return float(round(abs(prob - 0.5) * 2, 4))
+    return float(round(max(prob, 1.0 - prob) * 100.0, 2))
 
 
 def _risk_level(prob: float) -> str:
-    """Risk category thresholds replicate notebook 13 risk_category()."""
-    if prob < 0.30:
+    """Map calibrated probability to the contract's Low/Moderate/High bands."""
+    if not math.isfinite(prob) or not 0.0 <= prob <= 1.0:
+        raise ValueError("Calibrated probability is not finite or in [0, 1].")
+    low, high = risk_thresholds()
+    if prob < low:
         return "Low"
-    if prob < 0.70:
+    if prob < high:
         return "Moderate"
     return "High"
 
@@ -74,9 +91,9 @@ def _shap_attribution(
 ) -> tuple[float, list[FeatureContribution]]:
     """Exact TreeSHAP attribution for a single patient vector.
 
-    Returns the model's expected value (log-odds baseline) plus a contribution
-    for every feature, sorted by absolute impact. Values are log-odds-space
-    attributions for the positive (CVD) class.
+    Returns the model's expected value plus a contribution for every feature,
+    sorted by absolute impact. These explain the forest's raw output, which is
+    returned separately as ``probability_raw``.
     """
     explainer = _explainer()
     frame = pd.DataFrame([row], columns=FEATURE_ORDER)
@@ -110,7 +127,8 @@ def predict(input_: AssessmentInput) -> PredictionResponse:
     if model_feature_names != FEATURE_ORDER:
         raise ValueError(
             "Model feature order differs from the feature contract "
-            "(contract=%d, model=%d features)." % (len(FEATURE_ORDER), len(model_feature_names))
+            "(contract=%d, model=%d features)."
+            % (len(FEATURE_ORDER), len(model_feature_names))
         )
 
     row = to_model_row(input_)
@@ -118,16 +136,24 @@ def predict(input_: AssessmentInput) -> PredictionResponse:
 
     model = load_model()
     proba = model.predict_proba(frame)[0]
-    positive_index = int(list(model.classes_).index(1))
-    prob = float(proba[positive_index])
+    classes = list(model.classes_)
+    if 1 not in classes:
+        raise ValueError("Model does not expose a positive CVD class.")
+    positive_index = int(classes.index(1))
+    raw_prob = float(proba[positive_index])
+    if not math.isfinite(raw_prob) or not 0.0 <= raw_prob <= 1.0:
+        raise ValueError("Raw model probability is not finite or in [0, 1].")
+    prob = _calibrate(raw_prob)
 
     expected_value, contributions = _shap_attribution(row)
 
     return PredictionResponse(
         model=MODEL_NAME,
         probability=round(prob, 4),
+        probability_raw=round(raw_prob, 4),
         level=_risk_level(prob),
         confidence=_confidence(prob),
+        calibration=calibration_method(),
         feature_names=FEATURE_ORDER,
         feature_values=[round(float(v), 4) for v in row],
         expected_value=round(expected_value, 4),

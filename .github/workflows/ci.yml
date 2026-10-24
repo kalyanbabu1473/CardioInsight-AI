@@ -23,6 +23,9 @@ jobs:
       - name: Lint frontend
         working-directory: frontend
         run: npx oxlint
+      - name: Test frontend
+        working-directory: frontend
+        run: npm test
       - name: Build frontend
         working-directory: frontend
         run: npm run build
@@ -39,20 +42,22 @@ jobs:
           python-version: '3.13'
       - name: Ensure Git LFS content is present
         run: git lfs pull
-      - name: Verify model artifact is the real model (not an LFS pointer)
+      - name: Verify model + calibrator artifacts are real (not LFS pointers)
         run: |
           python - <<'PY'
           from pathlib import Path
-          p = Path('Models/Random_Forest/Random_Forest_Model.pkl')
-          exists = p.exists()
-          size = p.stat().st_size if exists else None
+          model = Path('Models/CardioAI_Clinical_Model.pkl')
+          calibrator = Path('Models/CardioAI_Clinical_Calibrator.pkl')
+          exists = model.exists() and calibrator.exists() and calibrator.stat().st_size > 0
+          size = model.stat().st_size if model.exists() else None
           is_pointer = (
-              p.read_bytes()[:40].startswith(b'version https://git-lfs.github.com/spec/v1')
-              if exists else False
+              model.read_bytes()[:40].startswith(b'version https://git-lfs.github.com/spec/v1')
+              if model.exists() else False
           )
           print('exists=', exists)
-          print('size=', size)
-          print('lfs_pointer=', is_pointer)
+          print('model_size=', size)
+          print('calibrator_size=', calibrator.stat().st_size if calibrator.exists() else None)
+          print('model_lfs_pointer=', is_pointer)
           if not exists or is_pointer or size < 10_000_000:
               raise SystemExit(1)
           PY
@@ -60,6 +65,10 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r backend/requirements.txt
+      - name: Verify generated frontend contract is in sync
+        run: python backend/scripts/sync_feature_contract_frontend.py --check
+      - name: Verify model artifacts and manifest match the contract
+        run: python backend/scripts/verify_model.py
       - name: Run backend tests
         run: |
           cd backend

@@ -13,12 +13,15 @@ import type { AssessmentResult } from "@/features/assessment/assessmentResult";
 import type { AssessmentInput } from "@/features/assessment/assessmentService";
 import { API_BASE_URL } from "./config";
 
-/** Payload the frontend sends to persist a completed assessment. */
+/**
+ * Payload the frontend sends to create an assessment.
+ *
+ * Only validated clinical input is sent. The server computes the model result,
+ * top factors, interpretation, and recommendations; legacy result fields are
+ * ignored if present.
+ */
 export interface CreateAssessmentPayload {
-  model: string;
-  modelTagline: string;
   input: AssessmentInput;
-  result: AssessmentResult["result"];
 }
 
 const client = axios.create({
@@ -75,29 +78,4 @@ export async function apiCreateAssessment(
 ): Promise<AssessmentResult> {
   const { data } = await client.post<unknown>("/assessments", payload);
   return toAssessmentResult(data);
-}
-
-/** Backend ML response from POST /api/predict (44-feature Random Forest). */
-export interface BackendPrediction {
-  model: string;
-  probability: number;
-  level: "Low" | "Moderate" | "High";
-  confidence: number;
-  feature_names: string[];
-  feature_values: number[];
-  expected_value: number;
-  contributions: {
-    feature: string;
-    label: string;
-    value: number;
-    contribution: number;
-  }[];
-}
-
-/** Runs the deployed Random Forest over the assessment inputs. */
-export async function apiPredict(
-  input: AssessmentInput,
-): Promise<BackendPrediction> {
-  const { data } = await client.post<unknown>("/predict", { input });
-  return data as BackendPrediction;
 }

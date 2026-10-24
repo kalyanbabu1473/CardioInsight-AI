@@ -1,0 +1,100 @@
+{
+  "schema_version": "1.0.0",
+  "generated_at": "2026-10-24T17:03:39+00:00",
+  "model_name": "CardioAI_Clinical_Model.pkl",
+  "calibration": "isotonic",
+  "risk_thresholds": {
+    "low": 0.05,
+    "high": 0.2
+  },
+  "feature_count": 18,
+  "feature_order": [
+    "RIDAGEYR",
+    "RIAGENDR",
+    "BMXHT",
+    "BMXWT",
+    "BMXWAIST",
+    "BMXBMI",
+    "BPXOSY1",
+    "BPXODI1",
+    "BPQ020",
+    "LBXGH",
+    "LBXGLU",
+    "LBXTC",
+    "LBDLDL",
+    "LBDHDD",
+    "LBXTR",
+    "LBXIN",
+    "SMQ020",
+    "SMQ040"
+  ],
+  "training": {
+    "dataset_sha256": "942ded50b3a23d95dbb9cfb2d0107779f4e1f23c14d35b1e0db295047410734b",
+    "target": "Composite_CVD (prevalent self-reported CVD)",
+    "cohort_rows": 3501,
+    "cohort_events": 392,
+    "train_rows": 2800,
+    "test_rows": 701,
+    "test_events": 78,
+    "split": {
+      "method": "stratified random 80/20",
+      "test_size": 0.2,
+      "random_state": 42
+    },
+    "seed": 42,
+    "metrics_version": "2.0.0"
+  },
+  "preprocessing": {
+    "version": "1.0.0",
+    "shared_module": "backend/app/ml/preprocessing.py",
+    "age_range": [
+      18.0,
+      80.0
+    ],
+    "complete_case": true,
+    "bmi": {
+      "formula": "weight_kg / (height_cm / 100) ** 2",
+      "rounding_decimals": 4,
+      "source_column": "BMXBMI (recorded NHANES field) is not used"
+    },
+    "smoking": {
+      "rule": "SMQ020=2 -> SMQ040=3",
+      "reason": "NHANES structural skip for never smokers",
+      "ever_smoker_codes": [
+        1,
+        2
+      ],
+      "current_smoker_codes": [
+        1,
+        2,
+        3
+      ]
+    }
+  },
+  "files": {
+    "model": {
+      "sha256": "9cce3674155a47a8b71cdd6f8285f5a3bc3ed31f164caf0bad7693f3932aebf2",
+      "bytes": 21795833
+    },
+    "calibrator": {
+      "sha256": "03d98ead24f6642118d6b21555668f3f1c951e5573fc156b009d63236f8b441b",
+      "bytes": 1255
+    },
+    "features": {
+      "sha256": "a9b03c54394270e36e9e42479fc541d588eaeed852ddc279d5f69da71290a4bf",
+      "bytes": 180
+    },
+    "contract": {
+      "sha256": "bda206403c7c9accc5594276b54c4cba421568c8ba99b680843630c89aab1059",
+      "bytes": 8726
+    },
+    "preprocessing": {
+      "sha256": "2f8dd295b0f4fc7305d45873f80fc0ce6b461f300d8724b2be40fa279e404b1e",
+      "bytes": 1083
+    },
+    "metrics": {
+      "sha256": "ae72816fa21bfca20676a20be704896dba510ae50f16f33d868a23b670377800",
+      "bytes": 6427
+    }
+  }
+}

@@ -19,7 +19,7 @@ export interface AssessmentResult {
   /**
    * True when a record was created by an older 20-feature build of the app
    * (flat input shape, sex/race/biomarkers present). Reports render these with
-   * a legacy badge instead of the current 44-feature layout.
+   * a legacy badge instead of the current 18-feature clinical layout.
    */
   legacy?: boolean;
 }

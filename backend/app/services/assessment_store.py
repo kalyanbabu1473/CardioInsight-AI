@@ -2,8 +2,9 @@
 
 CardioInsight AI no longer persists assessments to Supabase/PostgreSQL/SQLite.
 The assessment API keeps the records produced during the lifetime of this
-backend process so the existing frontend can create, list, and fetch reports
-using the same routes and payloads as before.
+backend process so the existing frontend can create, list, and fetch reports.
+Records are created only from server-side model output, never from a client
+result.
 
 This store is intentionally process-local and NOT durable: a restart clears the
 history. A completed assessment is returned to the client immediately, so the
@@ -49,7 +50,7 @@ class InMemoryAssessmentStore:
         result: dict[str, Any],
         created_at: datetime | None = None,
     ) -> AssessmentRecord:
-        """Store a client-computed assessment and assign its sequential ID."""
+        """Store a server-computed assessment and assign its sequential ID."""
         now = created_at or datetime.now(timezone.utc)
         with self._lock:
             prefix = id_prefix(now)

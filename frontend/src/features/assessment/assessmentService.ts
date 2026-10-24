@@ -1,13 +1,12 @@
 /**
- * Assessment domain logic — pure, framework-free functions that power the
- * guided clinical wizard and the risk engine. Kept separate from React so the
- * same model can be swapped for a real backend inference call later without
- * touching the UI.
+ * Assessment domain logic - pure, framework-free functions that power the
+ * guided clinical wizard and the risk result model. Kept separate from React so
+ * the same contract can be reused by the backend inference call.
  *
- * The intake is contract-driven: every input maps 1:1 to one of the 44 NHANES
+ * The intake is contract-driven: every input maps 1:1 to one of the 18 clinical
  * features the production Random Forest was trained on (see the feature
  * contract at `/data/assessment/featureContract.generated.ts`, generated from
- * `feature_contract.json`). There is no heuristic risk model on the frontend —
+ * `feature_contract.json`). There is no heuristic risk model on the frontend -
  * all probability / level / confidence / SHAP attribution authority lives on
  * the backend ML service.
  */
@@ -21,98 +20,52 @@ import {
 } from "@/data/assessment/featureContract";
 
 export type BinaryOption = "Yes" | "No";
-export type GenderOption = "Male" | "Female";
+export type SexOption = "Male" | "Female";
 export type SmokingStatusOption = "Every day" | "Some days" | "Not at all";
 
 export interface DemographicsInput {
-  age: number; // RIDAGEYR
-  gender: GenderOption; // RIAGENDR
+  age: number;
+  sex: SexOption;
 }
 
 export interface BodyCompositionInput {
-  weightKg: number; // BMXWT
-  heightCm: number; // BMXHT
-  waistCm: number; // BMXWAIST
+  weightKg: number;
+  heightCm: number;
+  waistCm: number;
 }
 
 export interface BloodPressureInput {
-  systolicBP1: number; // BPXOSY1
-  systolicBP2: number; // BPXOSY2
-  systolicBP3: number; // BPXOSY3
-  hypertensionDiagnosis: BinaryOption; // BPQ020
+  systolicBP: number;
+  diastolicBP: number;
+  hypertensionDiagnosis: BinaryOption;
 }
 
 export interface MetabolicInput {
-  hba1c: number; // LBXGH
-  fastingGlucose: number; // LBXGLU
-  insulin: number; // LBXIN
+  hba1c: number;
+  fastingGlucose: number;
+  insulin: number;
 }
 
 export interface LipidsInput {
-  ldlCholesterol: number; // LBDLDL
-  totalCholesterol: number; // LBXTC
-  triglycerides: number; // LBXTR
-  hdlCholesterol: number; // LBDHDD
-}
-
-export interface EnvironmentalToxinsInput {
-  bloodCadmium: number; // LBXBCD
-  bloodLead: number; // LBXBPB
-  bloodSelenium: number; // LBXBSE
-  urinaryThallium: number; // URXUTL
-  urinaryLead: number; // URXUPB
-  urinaryCadmium: number; // URXUCD
-  urinaryCobalt: number; // URXUCO
-  urinaryBarium: number; // URXUBA
-  urinaryAntimony: number; // URXUSB
-  urinaryTungsten: number; // URXUTU
-}
-
-export interface PfasInput {
-  pfos: number; // LBXNFOS
-  pfoa: number; // LBXNFOA
-  pfhxs: number; // LBXPFHS
-  pfna: number; // LBXPFNA
-  smPfos: number; // LBXMFOS
-}
-
-export interface UrinaryOpesInput {
-  bcep: number; // URXBCEP
-  bdcpp: number; // URXBDCP
-  dphp: number; // URXDPHP
-}
-
-export interface MedicalHistoryInput {
-  highCholesterolDiagnosis: BinaryOption; // BPQ080
-  cholesterolMedication: BinaryOption; // BPQ090D
-  arthritis: BinaryOption; // MCQ160A
+  totalCholesterol: number;
+  ldlCholesterol: number;
+  hdlCholesterol: number;
+  triglycerides: number;
 }
 
 export interface LifestyleInput {
-  workedOutsideHome7d: BinaryOption; // SMQ856
-  currentSmoking: SmokingStatusOption; // SMQ040
-  dailySittingMinutes: number; // PAD680
-  dietaryCaffeineMg: number; // DR1TCAFF
-  alcoholicDrinksPerDay: number; // ALQ130
+  everSmoked100: BinaryOption;
+  currentSmoking: SmokingStatusOption;
 }
 
-export interface SocioeconomicInput {
-  incomePovertyRatio: number; // INDFMPIR
-}
-
-/** The complete clinical intake — all 44 model features across 11 sections. */
+/** The complete clinical intake - all 18 model features across 6 sections. */
 export interface AssessmentInput {
   demographics: DemographicsInput;
   bodyComposition: BodyCompositionInput;
   bloodPressure: BloodPressureInput;
   metabolic: MetabolicInput;
   lipids: LipidsInput;
-  environmentalToxins: EnvironmentalToxinsInput;
-  pfas: PfasInput;
-  urinaryOpes: UrinaryOpesInput;
-  medicalHistory: MedicalHistoryInput;
   lifestyle: LifestyleInput;
-  socioeconomic: SocioeconomicInput;
 }
 
 export type RiskLevel = "Low" | "Moderate" | "High";
@@ -132,6 +85,7 @@ export interface RecommendationCategories {
 export interface RiskResult {
   probability: number;
   level: RiskLevel;
+  /** Prediction certainty as a 0-100 percentage. */
   confidence: number;
   interpretation: string;
   topFactors: Contribution[];
@@ -140,18 +94,14 @@ export interface RiskResult {
 
 export type StepErrors = Record<string, string>;
 
-/* ------------------------------------------------------------------ */
-/*  Model configuration                                                */
-/* ------------------------------------------------------------------ */
-
 export const PREDICTION_MODEL = {
-  name: "Random Forest (Composite CVD — 44 features)",
-  tagline: "Production Model",
+  name: "Random Forest (Clinical CVD - 18 features)",
+  tagline: "Calibrated Clinical Model",
   description:
-    "Ensemble of decision trees trained on the NHANES consensus dataset with 44 clinical, environmental and PFAS features collected across the 11-section wizard.",
+    "Calibrated ensemble of decision trees trained on the NHANES clinical dataset using 18 routinely collectable cardiovascular risk features across the 6-section assessment.",
 };
 
-export const STEP_COUNT = 12;
+export const STEP_COUNT = 7;
 
 export const stepLabel = (step: number): string => {
   const category = WIZARD_STEP_CATEGORY[step];
@@ -164,24 +114,14 @@ export const stepDescription = (step: number): string => {
       return "Demographic baseline";
     case "Body Composition":
       return "Anthropometric data";
-    case "Blood Pressure":
+    case "Blood Pressure & History":
       return "Hemodynamic status";
-    case "Metabolic":
+    case "Metabolic Panel":
       return "Glucose and insulin panel";
-    case "Lipids":
+    case "Lipid Panel":
       return "Cholesterol panel";
-    case "Environmental Toxins":
-      return "Heavy metals in blood and urine";
-    case "PFAS Compounds":
-      return "Persistent organic pollutants";
-    case "Urinary Organophosphate Esters":
-      return "Flame-retardant metabolites";
-    case "Medical History":
-      return "Diagnoses and medication";
     case "Lifestyle":
       return "Behavioral risk factors";
-    case "Socioeconomic":
-      return "Income context";
     default:
       return "Confirm patient record";
   }
@@ -194,28 +134,29 @@ export const WIZARD_STEP_CATEGORY: Partial<Record<number, CategoryKey>> = {
   3: "bloodPressure",
   4: "metabolic",
   5: "lipids",
-  6: "environmentalToxins",
-  7: "pfas",
-  8: "urinaryOpes",
-  9: "medicalHistory",
-  10: "lifestyle",
-  11: "socioeconomic",
+  6: "lifestyle",
 };
-
-/* ------------------------------------------------------------------ */
-/*  Field access & formatting                                          */
-/* ------------------------------------------------------------------ */
 
 /** Reads the value for a feature from an assessment input by its dot-path. */
 export function featureValue(
   input: AssessmentInput,
   feature: FeatureSpec,
-): number | BinaryOption {
+): number | BinaryOption | SexOption | SmokingStatusOption {
+  if (feature.derived && feature.name === "BMXBMI") {
+    return calculateBmi(
+      input.bodyComposition.heightCm,
+      input.bodyComposition.weightKg,
+    );
+  }
   const [section, field] = feature.field.split(".");
   const sectionValue = (
     input[section as keyof AssessmentInput] as unknown as Record<string, unknown>
   );
-  return sectionValue?.[field] as number | BinaryOption;
+  return sectionValue?.[field] as
+    | number
+    | BinaryOption
+    | SexOption
+    | SmokingStatusOption;
 }
 
 /** Human-readable display for a feature value (units / decoded Yes-No). */
@@ -237,16 +178,13 @@ export function formatFeatureValue(
   return feature.unit ? `${value} ${feature.unit}` : String(value);
 }
 
-/* ------------------------------------------------------------------ */
-/*  BMI helpers                                                        */
-/* ------------------------------------------------------------------ */
-
 export type BmiCategory = "Underweight" | "Normal" | "Overweight" | "Obese";
 
 export function calculateBmi(heightCm: number, weightKg: number): number {
-  if (!heightCm || !weightKg) return 0;
+  if (!Number.isFinite(heightCm) || !Number.isFinite(weightKg)) return 0;
+  if (heightCm <= 0 || weightKg <= 0) return 0;
   const meters = heightCm / 100;
-  return weightKg / (meters * meters);
+  return Math.round((weightKg / (meters * meters)) * 10000) / 10000;
 }
 
 export function bmiCategory(bmi: number): BmiCategory {
@@ -257,63 +195,28 @@ export function bmiCategory(bmi: number): BmiCategory {
   return "Obese";
 }
 
-/* ------------------------------------------------------------------ */
-/*  Initial state                                                      */
-/* ------------------------------------------------------------------ */
-
 export function createInitialInput(): AssessmentInput {
   return {
-    demographics: { age: 0, gender: "Female" },
+    demographics: { age: 0, sex: "Female" },
     bodyComposition: { weightKg: 0, heightCm: 0, waistCm: 0 },
     bloodPressure: {
-      systolicBP1: 0,
-      systolicBP2: 0,
-      systolicBP3: 0,
+      systolicBP: 0,
+      diastolicBP: 0,
       hypertensionDiagnosis: "No",
     },
     metabolic: { hba1c: 0, fastingGlucose: 0, insulin: 0 },
     lipids: {
-      ldlCholesterol: 0,
       totalCholesterol: 0,
-      triglycerides: 0,
+      ldlCholesterol: 0,
       hdlCholesterol: 0,
+      triglycerides: 0,
     },
-    environmentalToxins: {
-      bloodCadmium: 0,
-      bloodLead: 0,
-      bloodSelenium: 0,
-      urinaryThallium: 0,
-      urinaryLead: 0,
-      urinaryCadmium: 0,
-      urinaryCobalt: 0,
-      urinaryBarium: 0,
-      urinaryAntimony: 0,
-      urinaryTungsten: 0,
-    },
-    pfas: { pfos: 0, pfoa: 0, pfhxs: 0, pfna: 0, smPfos: 0 },
-    urinaryOpes: { bcep: 0, bdcpp: 0, dphp: 0 },
-    medicalHistory: {
-      highCholesterolDiagnosis: "No",
-      cholesterolMedication: "No",
-      arthritis: "No",
-    },
-    lifestyle: {
-      workedOutsideHome7d: "No",
-      currentSmoking: "Not at all",
-      dailySittingMinutes: 0,
-      dietaryCaffeineMg: 0,
-      alcoholicDrinksPerDay: 0,
-    },
-    socioeconomic: { incomePovertyRatio: 0 },
+    lifestyle: { everSmoked100: "No", currentSmoking: "Not at all" },
   };
 }
 
-/* ------------------------------------------------------------------ */
-/*  Validation                                                         */
-/* ------------------------------------------------------------------ */
-
 function withinRange(feature: FeatureSpec, value: number): boolean {
-  if (value <= 0) return false;
+  if (!Number.isFinite(value) || value <= 0) return false;
   if (feature.min !== undefined && value < feature.min) return false;
   if (feature.max !== undefined && value > feature.max) return false;
   return true;
@@ -336,16 +239,49 @@ export function validateStep(step: number, input: AssessmentInput): StepErrors {
   for (const feature of FEATURES) {
     if (feature.category !== category || feature.derived) continue;
     const value = section[feature.field.split(".")[1]];
-    if (feature.type === "continuous" && !withinRange(feature, value as number)) {
+    if (feature.type === "categorical") {
+      if (!feature.options?.includes(String(value))) {
+        errors[feature.name] = `${feature.label} is required`;
+      }
+      continue;
+    }
+    if (!withinRange(feature, value as number)) {
       const unit = feature.display?.unit ?? feature.unit;
-      const min = feature.min !== undefined ? feature.min / (feature.display?.factor ?? 1) : undefined;
-      const max = feature.max !== undefined ? feature.max / (feature.display?.factor ?? 1) : undefined;
+      const factor = feature.display?.factor ?? 1;
+      const min = feature.min !== undefined ? feature.min / factor : undefined;
+      const max = feature.max !== undefined ? feature.max / factor : undefined;
       errors[feature.name] =
         unit && min !== undefined && max !== undefined
-          ? `${feature.label} must be ${min}–${max} ${unit}`
+          ? `${feature.label} must be ${min}-${max} ${unit}`
           : `${feature.label} is required`;
     }
   }
+
+  if (category === "lifestyle") {
+    const { everSmoked100, currentSmoking } = input.lifestyle;
+    if (everSmoked100 === "No" && currentSmoking !== "Not at all") {
+      errors.SMQ040 = "Current smoking must be 'Not at all' when never smoked";
+    }
+  }
+
+  if (category === "bodyComposition") {
+    const height = input.bodyComposition.heightCm;
+    const weight = input.bodyComposition.weightKg;
+    const bmiSpec = getFeature("BMXBMI");
+    if (
+      Number.isFinite(height) &&
+      Number.isFinite(weight) &&
+      height > 0 &&
+      weight > 0
+    ) {
+      const bmi = calculateBmi(height, weight);
+      if (!withinRange(bmiSpec, bmi)) {
+        errors[bmiSpec.name] =
+          `Body mass index must be ${bmiSpec.min}-${bmiSpec.max} ${bmiSpec.unit}`;
+      }
+    }
+  }
+
   return errors;
 }
 

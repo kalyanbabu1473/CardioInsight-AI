@@ -47,6 +47,7 @@ import RecommendationCard, {
   type RecommendationVariant,
 } from "./RecommendationCard";
 import {
+  formatCertainty,
   formatDateTime,
   formatPercent,
   patientInfo,
@@ -253,9 +254,9 @@ export default function ReportViewer({
                   <FlaskConical size={16} />
                 </span>
                 <span className={styles.statValue}>
-                  {formatPercent(result.confidence, 0)}
+                  {formatCertainty(result.confidence)}
                 </span>
-                <span className={styles.statLabel}>Confidence Score</span>
+                <span className={styles.statLabel}>Prediction Certainty</span>
               </div>
               <div className={styles.stat}>
                 <span className={styles.statIcon}>
@@ -307,16 +308,18 @@ export default function ReportViewer({
           The Random Forest ensemble assigned this patient a{" "}
           <strong>{result.level.toLocaleLowerCase()}</strong> predicted
           cardiovascular risk of {formatPercent(result.probability)} with a
-          confidence score of {formatPercent(result.confidence, 0)}. The model
-          attribution below reflects how strongly each feature shifted the
-          prediction away from baseline, using SHAP (Shapley) explanations to
-          provide a transparent, per-patient rationale.
+          prediction certainty of {formatCertainty(result.confidence)}.
+          Certainty is max(p, 1 - p) * 100 for the calibrated CVD probability
+          p. It is not the probability that the prediction is correct and not a
+          measure of diagnostic accuracy. The attribution below reflects how
+          strongly each feature shifted the underlying forest score away from
+          baseline, using SHAP (Shapley) explanations to provide a transparent,
+          per-patient rationale.
         </p>
         <div className={styles.methodChips}>
           <span className={styles.chip}>SHAP · Local</span>
           <span className={styles.chip}>SHAP · Global</span>
           <span className={styles.chip}>Gini Importance · Global</span>
-          <span className={styles.chip}>LIME</span>
         </div>
       </ReportSection>
 

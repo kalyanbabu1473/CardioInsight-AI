@@ -1,8 +1,8 @@
 """Prediction endpoint — POST /api/predict.
 
-Receives the 44-feature AssessmentInput the frontend wizard collects, converts
-it to the exact ordered feature vector the deployed Random Forest was trained
-on, runs inference and returns a structured, clinically-appropriate response.
+Receives the 18-feature clinical AssessmentInput the frontend wizard collects,
+converts it to the exact ordered feature vector the deployed Random Forest was
+trained on, runs inference and returns a structured, calibrated response.
 Errors are logged server-side and returned to clients as generic validation
 messages only. The canonical feature contract is also served here so every
 client shares a single source of truth.
@@ -55,14 +55,14 @@ async def run_predict(payload: PredictRequest) -> PredictionResponse:
 
     try:
         return predict(payload.input)
-    except (ValueError, TypeError) as exc:  # invalid clinical input
-        logger.warning("Rejected prediction request: %s", exc)
+    except (ValueError, TypeError):  # invalid clinical input
+        logger.warning("Rejected prediction request: invalid clinical values")
         raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            status_code=status.HTTP_422_UNPROCESSABLE_CONTENT,
             detail="Provided clinical values are outside the supported range or incomplete.",
         )
     except Exception as exc:  # noqa: BLE001 - never leak internals
-        logger.exception("Prediction failed: %s", exc)
+        logger.exception("Prediction failed with %s", type(exc).__name__)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Prediction failed. Please try again.",

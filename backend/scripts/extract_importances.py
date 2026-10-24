@@ -4,8 +4,8 @@ Writes `frontend/src/features/reports/featureImportance.generated.ts`, the
 ImportanceRow array used by the ReportViewer's "Feature Importance" chart,
 so the report reflects the actual Random Forest rather than a placeholder.
 
-Run from the backend directory:
-    python scripts/extract_importances.py
+Run from the repository root:
+    backend/.venv/Scripts/python backend/scripts/extract_importances.py
 """
 
 from __future__ import annotations
@@ -42,8 +42,13 @@ def main() -> None:
         if not spec:
             continue
         picked.append(
-            (code, spec.get("label", code), float(importances[idx]),
-             spec.get("notes", ""), spec.get("domain", ""))
+            (
+                code,
+                spec.get("label", code),
+                float(importances[idx]),
+                spec.get("notes", ""),
+                spec.get("domain", ""),
+            )
         )
 
     top_share = sum(row[2] for row in picked)
@@ -51,7 +56,7 @@ def main() -> None:
         '/// <reference types="vite/client" />',
         "",
         "/*",
-        " * GENERATED FILE — do not edit by hand. Real global feature importances",
+        " * GENERATED FILE - do not edit by hand. Real global feature importances",
         " * (Gini importance on the deployed forest) extracted from the model.",
         " * Regenerate with scripts/extract_importances.py.",
         " */",
@@ -65,10 +70,8 @@ def main() -> None:
         "",
         "export const featureImportance: ImportanceRow[] = [",
     ]
-    for code, label, imp, notes, domain in sorted(
-        picked, key=lambda r: -r[2]
-    ):
-        name = f"{code} — {label}"
+    for code, label, imp, notes, domain in sorted(picked, key=lambda r: -r[2]):
+        name = f"{code} - {label}"
         note = f"Share of total model importance: {imp * 100:.1f}%."
         description = (
             notes.replace("\\", "\\\\").replace('"', '\\"')

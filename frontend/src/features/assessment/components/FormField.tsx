@@ -104,6 +104,7 @@ interface AutoValueFieldProps {
   suffix?: string;
   status: ReactNode;
   hint?: string;
+  error?: string;
 }
 
 export function AutoValueField({
@@ -112,18 +113,20 @@ export function AutoValueField({
   suffix,
   status,
   hint,
+  error,
 }: AutoValueFieldProps) {
   return (
     <div className={styles.field}>
       <span className={styles.label}>{label}</span>
-      <div className={styles.inputWrap}>
+      <div className={clsx(styles.inputWrap, error && styles.inputWrapError)}>
         <div className={clsx(styles.input, styles.autoValue)}>
           <span>{value}</span>
           {suffix && <span className={styles.suffix}>{suffix}</span>}
         </div>
       </div>
       <div className={styles.autoStatus}>{status}</div>
-      {hint && <p className={styles.hint}>{hint}</p>}
+      <FieldError error={error} />
+      {hint && !error && <p className={styles.hint}>{hint}</p>}
     </div>
   );
 }

@@ -1,51 +1,49 @@
-"""Prediction endpoint tests — POST /api/predict against the deployed model."""
+"""Prediction endpoint tests - POST /api/predict against the deployed model."""
 
-from app.ml.prediction_service import MODEL_NAME
+from concurrent.futures import ThreadPoolExecutor
+
+import pytest
+
+from app.ml.prediction_service import MODEL_NAME, _confidence, _risk_level
 
 VALID_INPUT = {
-    "demographics": {"age": 48, "gender": "Female"},
+    "demographics": {"age": 48, "sex": "Female"},
     "bodyComposition": {"weightKg": 74, "heightCm": 172, "waistCm": 86},
     "bloodPressure": {
-        "systolicBP1": 128,
-        "systolicBP2": 126,
-        "systolicBP3": 125,
+        "systolicBP": 128,
+        "diastolicBP": 82,
         "hypertensionDiagnosis": "No",
     },
     "metabolic": {"hba1c": 5.6, "fastingGlucose": 102, "insulin": 14},
     "lipids": {
-        "ldlCholesterol": 132,
         "totalCholesterol": 208,
-        "triglycerides": 168,
+        "ldlCholesterol": 132,
         "hdlCholesterol": 46,
+        "triglycerides": 168,
     },
-    "environmentalToxins": {
-        "bloodCadmium": 0.4,
-        "bloodLead": 1.2,
-        "bloodSelenium": 190.0,
-        "urinaryThallium": 0.1,
-        "urinaryLead": 0.5,
-        "urinaryCadmium": 0.3,
-        "urinaryCobalt": 0.4,
-        "urinaryBarium": 2.0,
-        "urinaryAntimony": 0.1,
-        "urinaryTungsten": 0.1,
-    },
-    "pfas": {"pfos": 2.4, "pfoa": 2.1, "pfhxs": 1.5, "pfna": 0.4, "smPfos": 0.9},
-    "urinaryOpes": {"bcep": 0.8, "bdcpp": 1.1, "dphp": 0.7},
-    "medicalHistory": {
-        "highCholesterolDiagnosis": "No",
-        "cholesterolMedication": "No",
-        "arthritis": "No",
-    },
-    "lifestyle": {
-        "workedOutsideHome7d": "Yes",
-        "currentSmoking": "Some days",
-        "dailySittingMinutes": 420,
-        "dietaryCaffeineMg": 210,
-        "alcoholicDrinksPerDay": 2,
-    },
-    "socioeconomic": {"incomePovertyRatio": 2.4},
+    "lifestyle": {"everSmoked100": "Yes", "currentSmoking": "Some days"},
 }
+
+EXPECTED_FEATURES = [
+    "RIDAGEYR",
+    "RIAGENDR",
+    "BMXHT",
+    "BMXWT",
+    "BMXWAIST",
+    "BMXBMI",
+    "BPXOSY1",
+    "BPXODI1",
+    "BPQ020",
+    "LBXGH",
+    "LBXGLU",
+    "LBXTC",
+    "LBDLDL",
+    "LBDHDD",
+    "LBXTR",
+    "LBXIN",
+    "SMQ020",
+    "SMQ040",
+]
 
 
 def test_predict_status_reports_ready(client):
@@ -63,68 +61,63 @@ def test_predict_valid_input(client):
     body = res.json()
     assert body["model"] == MODEL_NAME
     assert 0.0 <= body["probability"] <= 1.0
+    assert 0.0 <= body["probability_raw"] <= 1.0
+    assert body["calibration"] == "isotonic"
     assert body["level"] in {"Low", "Moderate", "High"}
-    assert 0.0 <= body["confidence"] <= 1.0
-    assert len(body["feature_names"]) == 44
-    assert len(body["feature_values"]) == 44
+    assert 50.0 <= body["confidence"] <= 100.0
+    expected_certainty = round(
+        max(body["probability"], 1 - body["probability"]) * 100, 2
+    )
+    assert abs(body["confidence"] - expected_certainty) <= 0.01
+    assert len(body["feature_names"]) == 18
+    assert len(body["feature_values"]) == 18
 
 
 def test_predict_reports_shap_contributions(client):
     body = client.post("/api/predict", json={"input": VALID_INPUT}).json()
     assert isinstance(body["expected_value"], float)
-    assert len(body["contributions"]) == 44
-    for c in body["contributions"]:
-        assert c["feature"] in body["feature_names"]
-        assert c["label"]
-        assert isinstance(c["contribution"], float)
-    # TreeExplainer here operates in probability space: baseline + sum of
-    # attributions reproduces the model's predicted probability.
+    assert len(body["contributions"]) == 18
+    for contribution in body["contributions"]:
+        assert contribution["feature"] in body["feature_names"]
+        assert contribution["label"]
+        assert isinstance(contribution["contribution"], float)
     restored = body["expected_value"] + sum(
         c["contribution"] for c in body["contributions"]
     )
-    assert abs(restored - body["probability"]) < 0.05
-    # Sorted by absolute impact, most influential feature first.
-    mags = [abs(c["contribution"]) for c in body["contributions"]]
-    assert mags == sorted(mags, reverse=True)
+    assert abs(restored - body["probability_raw"]) < 2e-4
+    magnitudes = [abs(c["contribution"]) for c in body["contributions"]]
+    assert magnitudes == sorted(magnitudes, reverse=True)
 
 
 def test_predict_deterministic(client):
     first = client.post("/api/predict", json={"input": VALID_INPUT}).json()
     second = client.post("/api/predict", json={"input": VALID_INPUT}).json()
     assert first["probability"] == second["probability"]
+    assert first["probability_raw"] == second["probability_raw"]
 
 
 def test_predict_outputs_real_features(client):
     res = client.post("/api/predict", json={"input": VALID_INPUT}).json()
-    assert res["feature_names"] == [
-        "BMXWT", "BMXWAIST", "BPQ020", "BPQ090D", "LBXGH", "MCQ160A",
-        "PAD680", "RIDAGEYR", "RIAGENDR", "SMQ856", "SMQ040", "LBXBCD",
-        "BMXHT", "BMXBMI", "URXUPB", "URXUTL", "URXBCEP", "BPXOSY1",
-        "BPQ080", "BPXOSY2", "BPXOSY3", "LBXGLU", "LBXBSE", "LBXBPB",
-        "LBDLDL", "LBXNFOA", "LBXMFOS", "DR1TCAFF", "ALQ130", "LBXPFNA",
-        "LBXTC", "LBXPFHS", "URXBDCP", "URXDPHP", "URXUCO", "URXUCD",
-        "URXUBA", "LBXTR", "URXUSB", "URXUTU", "LBXNFOS", "INDFMPIR",
-        "LBDHDD", "LBXIN",
-    ]
+    assert res["feature_names"] == EXPECTED_FEATURES
 
 
 def test_predict_validates_range(client):
     bad = {**VALID_INPUT}
-    bad["demographics"] = {"age": 0}  # below supported minimum of 1
+    bad["demographics"] = {"age": 0, "sex": "Female"}
     res = client.post("/api/predict", json={"input": bad})
     assert res.status_code == 422
 
 
 def test_predict_rejects_bad_enum(client):
     bad = {**VALID_INPUT}
-    bad["medicalHistory"] = {**bad["medicalHistory"], "arthritis": "Maybe"}
+    bad["lifestyle"] = {**bad["lifestyle"], "currentSmoking": "Maybe"}
     res = client.post("/api/predict", json={"input": bad})
     assert res.status_code == 422
 
 
 def test_predict_rejects_missing_section(client):
     bad = {**VALID_INPUT}
-    del bad["pfas"]  # a model feature cannot be dropped without refusing prediction
+    del bad["lifestyle"]
     res = client.post("/api/predict", json={"input": bad})
     assert res.status_code == 422
 
@@ -140,6 +133,72 @@ def test_feature_contract_endpoint(client):
     res = client.get("/api/predict/feature-contract")
     assert res.status_code == 200
     body = res.json()
-    assert body["feature_count"] == 44
-    assert len(body["feature_order"]) == 44
-    assert len(body["features"]) == 44
+    assert body["feature_count"] == 18
+    assert len(body["feature_order"]) == 18
+    assert len(body["features"]) == 18
+    assert body["model"] == "CardioAI_Clinical_Model.pkl"
+    assert body["calibration"] == "isotonic"
+    assert body["risk_thresholds"] == {"low": 0.05, "high": 0.20}
+
+
+@pytest.mark.parametrize(
+    ("probability", "expected"),
+    [
+        (0.05, 95.0),
+        (0.20, 80.0),
+        (0.50, 50.0),
+        (0.80, 80.0),
+        (0.95, 95.0),
+    ],
+)
+def test_prediction_certainty_is_max_class_probability_percent(
+    probability, expected
+):
+    assert _confidence(probability) == expected
+
+
+@pytest.mark.parametrize(
+    ("probability", "expected"),
+    [
+        (0.0, "Low"),
+        (0.0499, "Low"),
+        (0.05, "Moderate"),
+        (0.1999, "Moderate"),
+        (0.20, "High"),
+        (1.0, "High"),
+    ],
+)
+def test_risk_thresholds_remain_at_contract_boundaries(probability, expected):
+    assert _risk_level(probability) == expected
+
+
+def test_concurrent_distinct_requests_do_not_leak_state():
+    """Each request must use its own input and return its own prediction."""
+    from fastapi.testclient import TestClient
+
+    from app.main import app
+
+    def submit(index):
+        body = {**VALID_INPUT, "demographics": dict(VALID_INPUT["demographics"])}
+        body["demographics"]["age"] = 20 if index % 2 == 0 else 80
+        body["demographics"]["sex"] = "Male" if index % 2 == 0 else "Female"
+        body["bloodPressure"] = {
+            **VALID_INPUT["bloodPressure"],
+            "systolicBP": 100 if index % 2 == 0 else 180,
+        }
+        with TestClient(app) as thread_client:
+            response = thread_client.post("/api/predict", json={"input": body})
+        return index, response
+
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        results = list(pool.map(submit, range(8)))
+
+    probabilities = {}
+    for index, response in results:
+        assert response.status_code == 200, response.text
+        body = response.json()
+        assert body["feature_values"][0] == (20.0 if index % 2 == 0 else 80.0)
+        probabilities.setdefault(index % 2, set()).add(body["probability"])
+    assert len(probabilities[0]) == 1
+    assert len(probabilities[1]) == 1
+    assert probabilities[0] != probabilities[1]

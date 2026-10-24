@@ -5,13 +5,14 @@ memory and the ML model artifacts are loaded directly from disk. No
 ``DATABASE_URL`` (or Supabase/PostgreSQL credential) is required.
 
 ML model artifacts live in the repository ``Models/`` directory by default
-(the tracked 44-feature production Random Forest
-``Models/Random_Forest/Random_Forest_Model.pkl`` — the real training model —
-plus the repo-root ``feature_contract.json`` contract). Paths resolve relative
-to the repository root via this module's location, so they work regardless of
-the process working directory (local dev, GitHub Actions, native Render).
-Override with ``ML_MODEL_PATH`` / ``ML_CONTRACT_PATH`` (or the Docker image
-variants) in production.
+(the 18-feature clinical Random Forest
+``Models/CardioAI_Clinical_Model.pkl``, its isotonic calibrator, and the
+repo-root ``feature_contract.json`` contract). Paths resolve relative to the
+repository root via this module's location, so they work regardless of the
+process working directory (local dev, GitHub Actions, native Render).
+Override with ``ML_MODEL_PATH``, ``ML_CALIBRATOR_PATH``, ``ML_FEATURES_PATH``,
+``ML_CONTRACT_PATH``, ``ML_PREPROCESSING_PATH``, ``ML_METRICS_PATH``, and
+``ML_MANIFEST_PATH`` (or the Docker image variants) in production.
 """
 
 import os
@@ -31,12 +32,33 @@ ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")
 # --- Model artifacts --------------------------------------------------------
 model_path = os.getenv(
     "ML_MODEL_PATH",
-    str(DEFAULT_MODELS_DIR / "Models" / "Random_Forest" / "Random_Forest_Model.pkl"),
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Model.pkl"),
+)
+calibrator_path = os.getenv(
+    "ML_CALIBRATOR_PATH",
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Calibrator.pkl"),
 )
 features_path = os.getenv(
     "ML_FEATURES_PATH",
-    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Assessment_Features.pkl"),
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Features.pkl"),
 )
+PREPROCESSING_PATH = os.getenv(
+    "ML_PREPROCESSING_PATH",
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Preprocessing.json"),
+)
+METRICS_PATH = os.getenv(
+    "ML_METRICS_PATH",
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Metrics.json"),
+)
+MANIFEST_PATH = os.getenv(
+    "ML_MANIFEST_PATH",
+    str(DEFAULT_MODELS_DIR / "Models" / "CardioAI_Clinical_Manifest.json"),
+)
+
+# Lower-case aliases match the older model/calibrator/features naming style.
+preprocessing_path = PREPROCESSING_PATH
+metrics_path = METRICS_PATH
+manifest_path = MANIFEST_PATH
 
 # Canonical feature contract (single source of truth, see app.core.feature_contract).
 CONTRACT_PATH = os.getenv(

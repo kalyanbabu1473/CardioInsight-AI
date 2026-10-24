@@ -1,9 +1,9 @@
 """Feature contract — the single source of truth shared by the entire app.
 
 The contract (`feature_contract.json` at the repository root) defines the exact
-44 features, their order (== ``Random_Forest_Model.pkl.feature_names_in_``),
-value ranges, and categorical encodings that the production model was trained
-on. Every layer — the wizard, the API input schema, the feature mapper, and the
+18 clinical features, their order (== ``CardioAI_Clinical_Model.pkl``'s
+``feature_names_in_``), value ranges, and categorical encodings that the
+production model was trained on. Every layer — the wizard, the API input schema, the feature mapper, and the
 report — is derived from it so the model always receives real, in-distribution
 values and never fabricated ones.
 
@@ -33,8 +33,19 @@ def load_contract() -> dict:
 
 
 def feature_order() -> list[str]:
-    """The authoritative 44-feature order (== model.feature_names_in_)."""
+    """The authoritative 18-feature order (== model.feature_names_in_)."""
     return list(load_contract()["feature_order"])
+
+
+def calibration_method() -> str:
+    """Probability calibration method used by the deployed artifact."""
+    return str(load_contract().get("calibration", "isotonic"))
+
+
+def risk_thresholds() -> tuple[float, float]:
+    """(low, high) calibrated-probability cutoffs for Low/Moderate/High."""
+    cfg = load_contract().get("risk_thresholds", {"low": 0.05, "high": 0.20})
+    return float(cfg["low"]), float(cfg["high"])
 
 
 def categories() -> list[dict]:
