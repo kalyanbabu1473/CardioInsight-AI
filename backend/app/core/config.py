@@ -144,15 +144,17 @@ def artifact_configuration() -> dict[str, ArtifactPathConfig]:
         )
         resolved = candidate.resolve()
 
+        expected_value = relative_default.as_posix()
         if candidate.name != relative_default.name:
             errors.append(
                 f"{env_var} must reference {relative_default.name!r}; "
-                f"got {candidate.name!r} ({resolved})"
+                f"got {candidate.name!r} ({resolved}); expected "
+                f"repository-relative value: {expected_value!r}"
             )
         if is_relative_override and not _is_within_repository(resolved):
             errors.append(
                 f"{env_var} is relative but resolves outside the repository root: "
-                f"{resolved}"
+                f"{resolved}; use {expected_value!r} or remove the variable"
             )
 
         configuration[role] = ArtifactPathConfig(

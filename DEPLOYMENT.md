@@ -217,6 +217,22 @@ docker compose build --build-arg INCLUDE_DATASET=false frontend
   `../Models/Random_Forest/Random_Forest_Model.pkl`; they are not needed and
   now fail configuration validation. Set only `ALLOWED_ORIGINS` if the frontend
   origin differs from the default.
+
+  If the service cannot be left without explicit overrides, the only correct
+  Render values are these repository-relative paths:
+
+  ```text
+  ML_MODEL_PATH=Models/CardioAI_Clinical_Model.pkl
+  ML_CALIBRATOR_PATH=Models/CardioAI_Clinical_Calibrator.pkl
+  ML_FEATURES_PATH=Models/CardioAI_Clinical_Features.pkl
+  ML_CONTRACT_PATH=feature_contract.json
+  ML_PREPROCESSING_PATH=Models/CardioAI_Clinical_Preprocessing.json
+  ML_METRICS_PATH=Models/CardioAI_Clinical_Metrics.json
+  ML_MANIFEST_PATH=Models/CardioAI_Clinical_Manifest.json
+  ```
+
+  Do not use `/opt/render/project/Models/...` or `../Models/...`: the deployed
+  repository root is `/opt/render/project/src`, so both resolve outside it.
 - **Remove** `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
   `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL`, `PGHOST`, `PGPORT`, `PGUSER`,
   `PGPASSWORD`, `PGDATABASE`, and any other database credentials from the
@@ -238,7 +254,7 @@ The frontend is served by the existing Render static site
 
 | Variable            | Default                                          | Purpose                                   |
 | ------------------- | ------------------------------------------------ | ----------------------------------------- |
-| `ML_MODEL_PATH`      | `Models/CardioAI_Clinical_Model.pkl`             | Path to the deployment Random Forest      |
+| `ML_MODEL_PATH`      | `Models/CardioAI_Clinical_Model.pkl`             | Path to the deployment clinical model     |
 | `ML_CALIBRATOR_PATH` | `Models/CardioAI_Clinical_Calibrator.pkl`        | Isotonic probability calibrator           |
 | `ML_FEATURES_PATH`   | `Models/CardioAI_Clinical_Features.pkl`          | Fallback ordered feature list             |
 | `ML_CONTRACT_PATH`   | `feature_contract.json`                          | Canonical 18-feature clinical contract    |
@@ -292,10 +308,12 @@ A start-time log line `ML model readiness failed at startup: ...` reports the
 same sanitized reason before health checks run.
 
 If the verifier prints `../Models/Random_Forest/Random_Forest_Model.pkl`,
-`../feature_contract.json`, or `source: ML_MODEL_PATH`, the Render service has
-stale path overrides. Delete the `ML_*` variables from the service, keep the
-repository root as the service root, clear the build cache, and redeploy. The
-default paths then resolve to the committed clinical artifacts.
+`/opt/render/project/Models/...`, `/opt/render/project/feature_contract.json`,
+or `source: ML_MODEL_PATH`, the Render service has stale path overrides. Those
+absolute paths are one directory above the deployed repository root
+(`/opt/render/project/src`). Delete the `ML_*` variables from the service, keep
+the repository root as the service root, clear the build cache, and redeploy.
+The default paths then resolve to the committed clinical artifacts.
 
 ---
 

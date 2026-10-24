@@ -120,7 +120,26 @@ def test_stale_legacy_override_is_rejected(monkeypatch):
     message = str(excinfo.value)
     assert "ML_MODEL_PATH must reference 'CardioAI_Clinical_Model.pkl'" in message
     assert "Random_Forest_Model.pkl" in message
+    assert "expected repository-relative value: 'Models/CardioAI_Clinical_Model.pkl'" in message
     assert "ML_CONTRACT_PATH is relative but resolves outside" in message
+    assert "use 'feature_contract.json' or remove the variable" in message
+
+
+def test_absolute_legacy_paths_are_rejected(monkeypatch, tmp_path):
+    monkeypatch.setenv(
+        "ML_MODEL_PATH", str(tmp_path / "Random_Forest_Model.pkl")
+    )
+    monkeypatch.setenv(
+        "ML_FEATURES_PATH", str(tmp_path / "CardioAI_Assessment_Features.pkl")
+    )
+
+    with pytest.raises(ArtifactConfigurationError) as excinfo:
+        artifact_configuration()
+
+    message = str(excinfo.value)
+    assert "Random_Forest_Model.pkl" in message
+    assert "CardioAI_Assessment_Features.pkl" in message
+    assert "'Models/CardioAI_Clinical_Features.pkl'" in message
 
 
 def test_verifier_fails_clearly_when_model_is_missing(tmp_path):
