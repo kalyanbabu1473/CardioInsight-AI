@@ -203,7 +203,7 @@ def main() -> None:
     }
 
     out = os.path.join(ROOT, "feature_contract.json")
-    with open(out, "w", encoding="utf-8") as fh:
+    with open(out, "w", encoding="utf-8", newline="\n") as fh:
         json.dump(contract, fh, indent=2, ensure_ascii=False)
     print(f"Wrote {out} with {len(FEATURES)} features.")
     print("Order: " + ", ".join(FEATURES))

@@ -141,7 +141,11 @@ def write_manifest(
     output = output or paths.manifest
     manifest = build_manifest(paths)
     output.parent.mkdir(parents=True, exist_ok=True)
-    output.write_text(json.dumps(manifest, indent=2) + "\n", encoding="utf-8")
+    output.write_text(
+        json.dumps(manifest, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     return output
 
 

@@ -3,3 +3,9 @@ Models/Random_Forest/Random_Forest_Model.pkl filter=lfs diff=lfs merge=lfs -text
 # The deployment model must be a real binary in every checkout. Git LFS is not
 # assumed on deployment hosts (for example Render), so never re-track it here.
 Models/CardioAI_Clinical_Model.pkl -text
+# The manifest pins these JSON artifacts by byte size and SHA-256. Keep their
+# checkout bytes stable across Windows and Linux; CRLF changes both values.
+feature_contract.json text eol=lf
+Models/CardioAI_Clinical_Preprocessing.json text eol=lf
+Models/CardioAI_Clinical_Metrics.json text eol=lf
+Models/CardioAI_Clinical_Manifest.json text eol=lf

@@ -182,6 +182,45 @@ def test_manifest_matches_default_artifacts():
     assert result["feature_count"] == 18
 
 
+def test_hashed_json_artifacts_are_lf_normalized():
+    manifest = json.loads(
+        (REPO_ROOT / "Models" / "CardioAI_Clinical_Manifest.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    paths = {
+        "contract": REPO_ROOT / "feature_contract.json",
+        "preprocessing": REPO_ROOT
+        / "Models"
+        / "CardioAI_Clinical_Preprocessing.json",
+        "metrics": METRICS_PATH,
+    }
+    for role, path in paths.items():
+        data = path.read_bytes()
+        assert b"\r\n" not in data, f"{role} must use LF line endings"
+        assert len(data) == manifest["files"][role]["bytes"]
+
+
+def test_lf_checkout_rules_cover_hashed_json_artifacts():
+    attributes = (REPO_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    rules = [
+        line.split()
+        for line in attributes.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    required = {
+        "feature_contract.json",
+        "Models/CardioAI_Clinical_Preprocessing.json",
+        "Models/CardioAI_Clinical_Metrics.json",
+        "Models/CardioAI_Clinical_Manifest.json",
+    }
+    for path in required:
+        matching = [rule for rule in rules if rule[0] == path]
+        assert any("eol=lf" in rule[1:] for rule in matching), (
+            f"{path} must be checked out with LF line endings"
+        )
+
+
 def test_contract_ranges_and_means_match_eligible_training_cohort():
     if not DATA_PATH.is_file():
         pytest.skip("source dataset is not available in this environment")

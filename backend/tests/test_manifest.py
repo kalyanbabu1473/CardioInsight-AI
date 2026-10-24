@@ -41,6 +41,10 @@ def test_manifest_default_is_valid():
     assert result["feature_count"] == 18
 
 
+def test_manifest_writer_uses_lf_line_endings(copied_paths):
+    assert b"\r\n" not in copied_paths.manifest.read_bytes()
+
+
 def test_manifest_build_is_deterministic_and_portable(copied_paths):
     first = build_manifest(copied_paths)
     second = build_manifest(copied_paths)

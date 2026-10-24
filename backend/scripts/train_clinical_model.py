@@ -310,7 +310,11 @@ def main() -> None:
     joblib.dump(model, MODEL_OUT)
     joblib.dump(calibrator, CALIBRATOR_OUT)
     joblib.dump(features, FEATURES_OUT)
-    METRICS_OUT.write_text(json.dumps(metrics, indent=2) + "\n", encoding="utf-8")
+    METRICS_OUT.write_text(
+        json.dumps(metrics, indent=2) + "\n",
+        encoding="utf-8",
+        newline="\n",
+    )
     PREPROCESSING_OUT.write_text(
         json.dumps(
             {
@@ -342,6 +346,7 @@ def main() -> None:
         )
         + "\n",
         encoding="utf-8",
+        newline="\n",
     )
 
     importance = pd.DataFrame(
