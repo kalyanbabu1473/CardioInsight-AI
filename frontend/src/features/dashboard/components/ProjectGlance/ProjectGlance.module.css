@@ -19,8 +19,9 @@
 
 .title {
   margin: 0 0 var(--space-2);
+  font-family: var(--font-serif);
   font-size: 26px;
-  font-weight: var(--weight-extrabold);
+  font-weight: var(--weight-regular);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
 }
@@ -28,7 +29,7 @@
 .subtitle {
   margin: 0 auto;
   max-width: 60ch;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
@@ -51,7 +52,7 @@
 
 .heading {
   margin: 0 0 var(--space-3);
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -70,7 +71,7 @@
 
 .bodyText {
   margin: 0;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
@@ -95,7 +96,7 @@
 }
 
 .fact dt {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -104,7 +105,7 @@
 
 .fact dd {
   margin: 0;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-medium);
   line-height: var(--leading-normal);
   color: var(--color-text-primary);
@@ -125,7 +126,7 @@
   display: flex;
   align-items: flex-start;
   gap: var(--space-2);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
 }
@@ -159,14 +160,14 @@
 
 .method h3 {
   margin: 0 0 var(--space-2);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 
 .method p {
   margin: 0;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
@@ -188,14 +189,14 @@
 
 .model h3 {
   margin: 0 0 var(--space-2);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 
 .model p {
   margin: 0;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
@@ -219,7 +220,7 @@
 
 .metricChips li {
   padding: var(--space-1) var(--space-3);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
   background: var(--color-surface-alt);
@@ -237,13 +238,13 @@
   width: 100%;
   min-width: 720px;
   border-collapse: collapse;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
 }
 
 .table thead th {
   padding: var(--space-3) var(--space-3);
   text-align: left;
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -296,7 +297,7 @@
 
 .techList li {
   padding: var(--space-1) var(--space-3);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
   background: var(--color-surface-alt);
@@ -324,7 +325,7 @@
 
 .workflowStep span {
   padding: var(--space-2) var(--space-4);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
   background: var(--color-primary-tint);

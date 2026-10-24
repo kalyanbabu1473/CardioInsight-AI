@@ -6,6 +6,7 @@ export { default as GlassPanel } from "./GlassPanel";
 export { default as Section } from "./Section";
 export { default as DashboardWidget } from "./DashboardWidget";
 export { default as CheckoutCard } from "./CheckoutCard";
+export { default as AnimatedBar } from "./AnimatedBar";
 export {
   AiHealthDisclaimer,
   AI_HEALTH_DISCLAIMER_FULL,

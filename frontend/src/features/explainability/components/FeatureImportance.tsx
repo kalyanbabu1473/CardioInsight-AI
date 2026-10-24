@@ -2,6 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 
+import AnimatedBar from "@/components/ui/AnimatedBar";
+
 import { featureImportance } from "../explainabilityData";
 
 import styles from "./FeatureImportance.module.css";
@@ -19,7 +21,6 @@ interface TipPosition {
 export default function FeatureImportance() {
   const [topN, setTopN] = useState(10);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
-  const [grown, setGrown] = useState(false);
   const [pos, setPos] = useState<TipPosition | null>(null);
 
   const rowRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -27,11 +28,6 @@ export default function FeatureImportance() {
 
   const max = featureImportance[0].importance;
   const visible = featureImportance.slice(0, topN);
-
-  useEffect(() => {
-    const id = requestAnimationFrame(() => setGrown(true));
-    return () => cancelAnimationFrame(id);
-  }, []);
 
   const positionTip = useCallback((index: number) => {
     const row = rowRefs.current[index];
@@ -94,7 +90,6 @@ export default function FeatureImportance() {
       <div className={styles.list}>
         {visible.map((feature, index) => {
           const pct = (feature.importance * 100).toFixed(1);
-          const widthPct = (feature.importance / max) * 100;
           const isActive = activeIndex === index;
 
           return (
@@ -116,12 +111,14 @@ export default function FeatureImportance() {
             >
               <span className={styles.label}>{feature.name}</span>
               <span className={styles.value}>{pct}%</span>
-              <span className={styles.track} aria-hidden="true">
-                <span
-                  className={styles.fill}
-                  style={{ width: grown ? `${widthPct}%` : "0%" }}
-                />
-              </span>
+              <AnimatedBar
+                value={feature.importance}
+                max={max}
+                height="lg"
+                delay={index * 0.05}
+                className={styles.bar}
+                ariaLabel={`${feature.name} importance: ${pct}%`}
+              />
             </button>
           );
         })}

@@ -35,7 +35,7 @@
   outline: none;
   width: 100%;
   background: transparent;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-family: inherit;
   color: var(--color-text-primary);
 }
@@ -52,7 +52,7 @@
   padding: 0 var(--space-4);
   background: var(--input-bg);
   backdrop-filter: blur(16px);
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-family: inherit;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -72,7 +72,7 @@
   background: var(--color-primary-tint);
   color: var(--color-primary);
   font-weight: var(--weight-semibold);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   white-space: nowrap;
 }
 

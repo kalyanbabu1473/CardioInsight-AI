@@ -1,4 +1,4 @@
-"""Health + persistence endpoint tests."""
+"""Health + DB-free assessment endpoint tests."""
 
 from app.ml.prediction_service import MODEL_NAME
 
@@ -8,7 +8,10 @@ def test_health_ok(client):
     assert res.status_code == 200
     body = res.json()
     assert body["status"] == "ok"
-    assert body["database"] in {"connected", "disconnected"}
+    assert body["database"] == "not_used"
+    assert body["model"]["ready"] is True
+    assert body["model"]["name"] == MODEL_NAME
+    assert body["model"]["detail"] is None
 
 
 def test_legacy_health_alias(client):
@@ -16,7 +19,8 @@ def test_legacy_health_alias(client):
     assert res.status_code == 200
     body = res.json()
     assert body["status"] == "ok"
-    assert body["database"] in {"connected", "disconnected"}
+    assert body["database"] == "not_used"
+    assert body["model"]["ready"] is True
 
 
 def _valid_input():
@@ -79,13 +83,19 @@ def _payload():
     }
 
 
-def test_create_assessment_persists(client):
+def test_assessment_history_starts_empty(client):
+    assert client.get("/api/assessments").json() == []
+    assert client.get("/api/assessments/latest").status_code == 404
+
+
+def test_create_assessment_without_database(client):
     res = client.post("/api/assessments", json=_payload())
     assert res.status_code == 201, res.text
     body = res.json()
     assert body["id"].startswith("CI-")
     assert body["result"]["level"] == "Low"
     assert body["legacy"] is False
+    assert body["createdAt"]
 
 
 def test_legacy_input_marked(client):
@@ -116,3 +126,43 @@ def test_get_latest_assessment(client):
     latest = client.get("/api/assessments/latest").json()
     assert latest["id"] == two["id"]
     assert latest["id"] != one["id"]
+
+
+def test_missing_assessment_returns_404(client):
+    assert client.get("/api/assessments/CI-19990101-0001").status_code == 404
+
+
+def test_frontend_flow_predict_then_store_current_report(client):
+    """Mirror the frontend: real prediction first, then store its result."""
+    prediction = client.post("/api/predict", json={"input": _valid_input()}).json()
+    payload = {
+        "model": prediction["model"],
+        "modelTagline": "Production Model",
+        "input": _valid_input(),
+        "result": {
+            "probability": prediction["probability"],
+            "level": prediction["level"],
+            "confidence": prediction["confidence"],
+            "interpretation": "Model-backed interpretation.",
+            "topFactors": [
+                {
+                    "name": c["label"],
+                    "value": str(c["value"]),
+                    "contribution": c["contribution"],
+                }
+                for c in prediction["contributions"][:6]
+            ],
+            "recommendations": {
+                "lifestyle": ["Keep active."],
+                "monitoring": ["Annual review."],
+                "medical": ["Routine care."],
+            },
+        },
+    }
+
+    created = client.post("/api/assessments", json=payload)
+    assert created.status_code == 201, created.text
+    body = created.json()
+    assert body["result"]["probability"] == prediction["probability"]
+    assert body["result"]["level"] == prediction["level"]
+    assert client.get("/api/assessments/latest").json()["id"] == body["id"]

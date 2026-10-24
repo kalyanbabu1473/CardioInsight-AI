@@ -49,13 +49,13 @@
 }
 
 .title {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
 }
 
 .message {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   line-height: var(--leading-relaxed);
 }

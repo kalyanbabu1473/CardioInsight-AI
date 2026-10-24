@@ -9,12 +9,9 @@ services:
       ENVIRONMENT: production
       HOST: 0.0.0.0
       PORT: 8000
-      DATABASE_URL: sqlite:////app/data/cardioinsight.db
-      # Add comma-separated origins that may call the API directly (e.g. the
-      # externally-published frontend), for example:
+      # No database is used. Add comma-separated origins that may call the API
+      # directly (e.g. the externally-published frontend), for example:
       #   ALLOWED_ORIGINS: https://app.example.com
-    volumes:
-      - cardioinsight-data:/app/data
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request;urllib.request.urlopen('http://127.0.0.1:8000/health')"]
       interval: 30s
@@ -39,6 +36,3 @@ services:
       interval: 30s
       timeout: 5s
       retries: 3
-
-volumes:
-  cardioinsight-data:

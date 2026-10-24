@@ -35,14 +35,14 @@
 }
 
 .card h4 {
-  font-size: var(--font-h4);
+  font-size: var(--font-size-h4);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   margin: 0;
 }
 
 .card p {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
   margin: 0;
@@ -59,14 +59,14 @@
 }
 
 .conclusion h4 {
-  font-size: var(--font-h4);
+  font-size: var(--font-size-h4);
   font-weight: var(--weight-bold);
   color: var(--color-primary);
   margin: 0;
 }
 
 .conclusion p {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-primary);
   margin: 0;

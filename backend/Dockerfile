@@ -1,5 +1,5 @@
 # CardioInsight AI — backend image
-# Serves the FastAPI persistence + prediction API.
+# Serves the FastAPI prediction + DB-free assessment API.
 FROM python:3.13-slim
 
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -20,14 +20,13 @@ COPY Models/Random_Forest/Random_Forest_Model.pkl ./Models/Random_Forest_Model.p
 COPY Models/CardioAI_Assessment_Features.pkl ./Models/CardioAI_Assessment_Features.pkl
 COPY feature_contract.json ./feature_contract.json
 
-# Production defaults (override via env / compose).
+# Production defaults (override via env / compose). No database is required.
 ENV ENVIRONMENT=production \
     HOST=0.0.0.0 \
     PORT=8000 \
     ML_MODEL_PATH=/app/Models/Random_Forest_Model.pkl \
     ML_CONTRACT_PATH=/app/feature_contract.json \
-    ML_FEATURES_PATH=/app/Models/CardioAI_Assessment_Features.pkl \
-    DATABASE_URL=sqlite:////app/data/cardioinsight.db
+    ML_FEATURES_PATH=/app/Models/CardioAI_Assessment_Features.pkl
 
 # Build-time gate: fail the build if the model is an LFS pointer, unloadable,
 # or does not exactly match the 44-feature contract. Only this script is copied
@@ -36,8 +35,9 @@ ENV ENVIRONMENT=production \
 COPY backend/scripts/verify_model.py ./scripts/verify_model.py
 RUN python ./scripts/verify_model.py
 
-# Application code runs unprivileged; the data dir is writable by UID 10001.
-RUN mkdir -p /app/data && chown -R 10001:10001 /app
+# Application runs unprivileged. It only reads code/model files and writes
+# nothing, since assessment history is process-local memory.
+RUN chown -R 10001:10001 /app
 USER 10001
 
 EXPOSE 8000

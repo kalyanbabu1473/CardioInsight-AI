@@ -33,7 +33,7 @@
   gap: var(--space-2);
   padding: 4px 10px;
   border-radius: var(--radius-full);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   letter-spacing: 0.03em;
   color: #fff;
@@ -71,7 +71,7 @@
 }
 
 .header h3 {
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -79,7 +79,7 @@
 }
 
 .tagline {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--color-primary);
   text-transform: uppercase;
@@ -87,7 +87,7 @@
 }
 
 .explanation {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   margin: 0;
@@ -105,7 +105,7 @@
   background: var(--color-surface-alt);
   border: 1px solid var(--color-border);
   color: var(--color-text-secondary);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
 }
 
@@ -123,7 +123,7 @@
 }
 
 .barLabel {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-secondary);
   font-weight: var(--weight-medium);
 }
@@ -132,21 +132,26 @@
   height: 10px;
   border-radius: var(--radius-full);
   background: var(--color-surface-alt);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: visible;
 }
 
 .fill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   border-radius: var(--radius-full);
   background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
 }
 
 .production .fill {
-  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+  box-shadow: none;
 }
 
 .barValue {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   text-align: right;
@@ -161,7 +166,7 @@
 }
 
 .twoCol h5 {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -180,7 +185,7 @@
 
 .twoCol li {
   position: relative;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
   padding-left: var(--space-3);
@@ -199,7 +204,7 @@
 }
 
 .useCase {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
   margin: 0;

@@ -9,7 +9,9 @@
 }
 
 .heading h2 {
+  font-family: var(--font-serif);
   font-size: 38px;
+  font-weight: var(--weight-regular);
   margin-bottom: 14px;
   color: var(--color-text-primary);
 }
@@ -63,7 +65,7 @@
 
 @media (max-width: 640px) {
   .heading h2 {
-    font-size: var(--font-h2);
+    font-size: var(--font-size-h2);
   }
 
   .grid {

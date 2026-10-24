@@ -41,7 +41,7 @@
 }
 
 .title {
-  font-size: var(--font-h4);
+  font-size: var(--font-size-h4);
   font-weight: var(--weight-bold);
   line-height: var(--leading-tight);
   color: var(--color-text-primary);
@@ -59,7 +59,7 @@
 }
 
 .list li {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
 }

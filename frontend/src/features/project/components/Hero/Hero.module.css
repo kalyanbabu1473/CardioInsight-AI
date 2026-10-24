@@ -17,17 +17,18 @@
 }
 
 .left h1 {
-  font-size: var(--font-display);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-display);
   line-height: var(--leading-tight);
   margin: var(--space-4) 0;
-  font-weight: var(--weight-extrabold);
+  font-weight: var(--weight-regular);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
 }
 
 .left p {
   margin: 0;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   max-width: 720px;
@@ -70,13 +71,13 @@
 
 .card h3 {
   margin: 0;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
 .card strong {
   display: block;
-  font-size: var(--font-h2);
+  font-size: var(--font-size-h2);
   margin: var(--space-3) 0 var(--space-1);
   color: var(--color-text-primary);
 }
@@ -94,7 +95,7 @@
 
 @media (max-width: 640px) {
   .left h1 {
-    font-size: var(--font-h1);
+    font-size: var(--font-size-h1);
   }
 
   .buttons {

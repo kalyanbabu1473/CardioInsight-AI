@@ -11,7 +11,7 @@
 }
 
 .header h2 {
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -26,7 +26,7 @@
   color: var(--color-primary);
   cursor: pointer;
   font-weight: var(--weight-semibold);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-family: inherit;
   transition: color var(--transition-fast) var(--ease-out);
 }
@@ -92,8 +92,8 @@
 }
 
 .id {
-  font-family: var(--font-heading);
-  font-size: var(--font-label);
+  font-family: var(--font-sans);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   letter-spacing: 0.12em;
   color: var(--accent);
@@ -103,16 +103,16 @@
 }
 
 .title {
-  font-family: var(--font-heading);
-  font-size: var(--font-h4);
-  font-weight: var(--weight-bold);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-h4);
+  font-weight: var(--weight-regular);
   line-height: var(--leading-tight);
   color: var(--color-text-primary);
   margin: 0 0 var(--space-2);
 }
 
 .description {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   margin: 0;
@@ -132,7 +132,7 @@
 }
 
 .phase {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 12%, var(--color-surface));

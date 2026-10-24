@@ -69,22 +69,84 @@ ul{
     list-style:none;
 
 }
-:root{
-
-    --font-heading:"Plus Jakarta Sans",sans-serif;
-
-    --font-body:"Inter",sans-serif;
-
-}
+/* ---------- GLOBAL TYPOGRAPHY ---------- */
 
 body{
-
-    font-family:var(--font-body);
-
+    font-family:var(--font-sans);
+    font-size:var(--font-size-body);
+    line-height:var(--leading-normal);
 }
 
 h1,h2,h3,h4,h5,h6{
+    font-family:var(--font-serif);
+    line-height:var(--leading-tight);
+    letter-spacing:-0.01em;
+}
 
-    font-family:var(--font-heading);
+h1{
+    font-size:var(--font-size-h1);
+    font-weight:var(--weight-regular);
+}
 
+h2{
+    font-size:var(--font-size-h2);
+    font-weight:var(--weight-regular);
+}
+
+h3{
+    font-size:var(--font-size-h3);
+    font-weight:var(--weight-regular);
+}
+
+h4{
+    font-size:var(--font-size-h4);
+    font-weight:var(--weight-medium);
+}
+
+h5{
+    font-size:var(--font-size-body);
+    font-weight:var(--weight-semibold);
+    font-family:var(--font-sans);
+}
+
+h6{
+    font-size:var(--font-size-sm);
+    font-weight:var(--weight-semibold);
+    font-family:var(--font-sans);
+    letter-spacing:0.02em;
+    text-transform:uppercase;
+}
+
+/* ---------- EDITORIAL EMPHASIS (italic serif) ---------- */
+.text-italic-serif{
+    font-family:var(--font-serif);
+    font-style:italic;
+}
+
+/* ---------- RESPONSIVE TYPOGRAPHY ---------- */
+@media(max-width:1024px){
+    :root{
+        --font-size-display:44px;
+        --font-size-h1:34px;
+        --font-size-h2:26px;
+        --font-size-h3:20px;
+    }
+}
+
+@media(max-width:768px){
+    :root{
+        --font-size-display:36px;
+        --font-size-h1:28px;
+        --font-size-h2:22px;
+        --font-size-h3:18px;
+    }
+}
+
+@media(max-width:480px){
+    :root{
+        --font-size-display:28px;
+        --font-size-h1:24px;
+        --font-size-h2:20px;
+        --font-size-h3:17px;
+    }
 }

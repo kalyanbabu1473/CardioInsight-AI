@@ -39,13 +39,13 @@
 }
 
 .modelName {
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 
 .modelTag {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--color-primary);
   text-transform: uppercase;
@@ -71,7 +71,7 @@
 }
 
 .overview {
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   margin: 0;
@@ -84,7 +84,7 @@
 }
 
 .block h5 {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   letter-spacing: 0.05em;
   text-transform: uppercase;
@@ -103,7 +103,7 @@
 
 .block li {
   position: relative;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-secondary);
   padding-left: var(--space-3);
@@ -122,7 +122,7 @@
 }
 
 .recommend {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   padding: var(--space-4);

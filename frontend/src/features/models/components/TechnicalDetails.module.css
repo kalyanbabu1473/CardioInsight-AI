@@ -36,7 +36,7 @@
 }
 
 .blockHead h3 {
-  font-size: var(--font-h4);
+  font-size: var(--font-size-h4);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   margin: 0;
@@ -61,13 +61,13 @@
 }
 
 .key {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   color: var(--color-text-muted);
 }
 
 .value {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   line-height: var(--leading-normal);
   color: var(--color-text-primary);
 }

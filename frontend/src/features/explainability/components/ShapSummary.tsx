@@ -63,7 +63,7 @@ export default function ShapSummary() {
               cursor={{ fill: "var(--color-surface-alt)" }}
               content={<ShapTooltip />}
             />
-            <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={14}>
+            <Bar dataKey="value" radius={[6, 6, 6, 6]} barSize={16}>
               {shapSummary.map((row) => (
                 <Cell
                   key={row.name}

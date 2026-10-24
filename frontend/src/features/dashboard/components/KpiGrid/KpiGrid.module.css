@@ -36,7 +36,7 @@
 }
 
 .title {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-1);
@@ -51,7 +51,7 @@
 }
 
 .subtitle {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-top: var(--space-1);
 }

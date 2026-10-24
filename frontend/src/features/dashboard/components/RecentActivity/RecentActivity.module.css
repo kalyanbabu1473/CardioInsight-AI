@@ -95,7 +95,7 @@
 }
 
 .meta h3 {
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
   margin: 0;
@@ -110,7 +110,7 @@
 }
 
 .meta p {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-top: 3px;
   white-space: nowrap;
@@ -119,7 +119,7 @@
 }
 
 .time {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-medium);
   color: var(--color-text-muted);
   background: var(--color-surface-alt);

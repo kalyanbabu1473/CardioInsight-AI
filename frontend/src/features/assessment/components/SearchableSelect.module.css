@@ -17,7 +17,7 @@
   background: var(--color-surface-alt);
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-medium);
   display: flex;
   align-items: center;
@@ -99,7 +99,7 @@
   background: transparent;
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
 }
 
 .searchInput::placeholder {
@@ -122,7 +122,7 @@
   padding: var(--space-2) var(--space-3);
   border-radius: var(--radius-sm);
   cursor: pointer;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   transition:
     background var(--transition-fast) var(--ease-out),
@@ -151,6 +151,6 @@
 .empty {
   padding: var(--space-3);
   text-align: center;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }

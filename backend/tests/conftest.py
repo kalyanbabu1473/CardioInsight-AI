@@ -1,15 +1,14 @@
 """Pytest fixtures for the CardioInsight backend.
 
-Points the app at a temporary SQLite database and the exact production model
-artifacts shipped in the Docker image (the tracked 44-feature Random Forest
+Points the app at the exact production model artifacts shipped in the Docker
+image (the tracked 44-feature Random Forest
 ``Models/Random_Forest/Random_Forest_Model.pkl`` + the feature contract) before
 any application module is imported, then exposes a ``TestClient`` for endpoint
-tests.
+tests. No database is configured or required.
 """
 
 import os
 import sys
-import tempfile
 from pathlib import Path
 
 import pytest
@@ -33,14 +32,13 @@ os.environ.setdefault(
     str(REPO_ROOT / "feature_contract.json"),
 )
 
-_tmp_db = tempfile.NamedTemporaryFile(suffix=".db", delete=False)
-_tmp_db.close()
-os.environ["DATABASE_URL"] = "sqlite:///" + _tmp_db.name.replace("\\", "/")
+# Prove the suite runs without any database configuration.
+os.environ.pop("DATABASE_URL", None)
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.database.session import Base, engine  # noqa: E402
 from app.main import app  # noqa: E402
+from app.services.assessment_store import store  # noqa: E402
 
 
 @pytest.fixture(scope="session")
@@ -50,8 +48,8 @@ def client():
 
 
 @pytest.fixture(autouse=True)
-def _fresh_tables():
-    """Recreate schema for each test so assertions stay independent."""
+def _fresh_store():
+    """Clear process-local history around each test for isolation."""
+    store.clear()
     yield
-    Base.metadata.drop_all(bind=engine)
-    Base.metadata.create_all(bind=engine)
+    store.clear()

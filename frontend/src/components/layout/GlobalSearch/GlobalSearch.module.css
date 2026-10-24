@@ -35,7 +35,7 @@
   border: none;
   background: transparent;
   outline: none;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-family: inherit;
   color: var(--color-text-primary);
 }
@@ -122,7 +122,7 @@
 }
 
 .optionLabel {
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-semibold);
   color: var(--color-text-primary);
   white-space: nowrap;
@@ -131,7 +131,7 @@
 }
 
 .optionDetail {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   white-space: nowrap;
   overflow: hidden;
@@ -140,7 +140,7 @@
 
 .typeTag {
   flex-shrink: 0;
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-secondary);
   background: var(--color-surface-alt);
   padding: 2px 8px;
@@ -160,6 +160,6 @@
   padding: var(--space-5) var(--space-4);
   text-align: center;
   color: var(--color-text-secondary);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   margin: 0;
 }

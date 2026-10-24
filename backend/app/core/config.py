@@ -1,8 +1,8 @@
 """Application configuration, driven by environment variables.
 
-The persistence layer is SQLAlchemy-backed. In development it defaults to a
-local SQLite file inside ``backend/database/``; for production point
-``DATABASE_URL`` at PostgreSQL/Supabase without changing any code.
+There is no database configuration: assessments are served from process-local
+memory and the ML model artifacts are loaded directly from disk. No
+``DATABASE_URL`` (or Supabase/PostgreSQL credential) is required.
 
 ML model artifacts live in the repository ``Models/`` directory by default
 (the tracked 44-feature production Random Forest
@@ -21,20 +21,9 @@ from dotenv import load_dotenv
 
 PACKAGE_ROOT = Path(__file__).resolve().parent.parent.parent
 DEFAULT_MODELS_DIR = Path(__file__).resolve().parent.parent.parent.parent
-DEFAULT_DATABASE_PATH = PACKAGE_ROOT / "database" / "cardioinsight.db"
 
 # Load backend/.env into the environment (real env vars take precedence).
 load_dotenv(PACKAGE_ROOT / ".env", override=False)
-
-
-def _resolve_database_url() -> str:
-    url = os.getenv("DATABASE_URL", "")
-    if url:
-        return url
-    return f"sqlite:///{DEFAULT_DATABASE_PATH.as_posix()}"
-
-
-DATABASE_URL = _resolve_database_url()
 
 # --- Environment ------------------------------------------------------------
 ENVIRONMENT: str = os.getenv("ENVIRONMENT", "development")

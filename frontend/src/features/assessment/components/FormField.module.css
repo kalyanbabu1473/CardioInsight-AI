@@ -5,7 +5,7 @@
 }
 
 .label {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-semibold);
   color: var(--color-text-secondary);
 }
@@ -48,7 +48,7 @@
   background: transparent;
   color: var(--color-text-primary);
   font-family: inherit;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-medium);
   -moz-appearance: textfield;
   appearance: textfield;
@@ -82,7 +82,7 @@
 .suffix {
   position: absolute;
   right: var(--space-4);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
   pointer-events: none;
 }
@@ -90,7 +90,7 @@
 .autoValue {
   display: flex;
   align-items: center;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-semibold);
 }
 
@@ -99,26 +99,26 @@
 }
 
 .error {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-danger);
   font-weight: var(--weight-medium);
 }
 
 .hint {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
   line-height: var(--leading-normal);
 }
 
 .suggestion {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-primary);
   font-weight: var(--weight-medium);
   min-height: 18px;
 }
 
 .range {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
 }
 
@@ -139,7 +139,7 @@
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-semibold);
   font-family: inherit;
   cursor: pointer;
@@ -162,6 +162,6 @@
 
 @media (max-width: 640px) {
   .segmentButton {
-    font-size: var(--font-label);
+    font-size: var(--font-size-label);
   }
 }

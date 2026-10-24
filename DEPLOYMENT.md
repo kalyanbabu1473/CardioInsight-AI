@@ -13,25 +13,35 @@ that verify a healthy stack.
    │  (Vite dev server :5173  |  nginx :80/:3000 in production)
    ▼
  Frontend (React SPA)
-   │  POST /api/predict       (ML inference)
-   │  POST/GET /api/assessments   (persistence)
+   │  POST /api/predict             (ML inference)
+   │  POST/GET /api/assessments     (process-local history, no database)
    ▼
  Backend (FastAPI :8000)
-   ├── ml/        loads Models/CardioAI_Assessment_Model.pkl + feature list
-   ├── api/       /api/predict, /api/assessments, /api/health
-   └── database/  SQLAlchemy (SQLite by default; PostgreSQL in production)
+   ├─ ml/        loads Models/Random_Forest/Random_Forest_Model.pkl + contract
+   ├─ api/       /api/predict, /api/assessments, /api/health
+   └─ services/  in-memory assessment history (cleared on restart)
 ```
 
 - The **prediction is authoritative**: the frontend calls `POST /api/predict`
   and displays whatever probability/level/confidence the backend returns. It
   never overrides those numbers locally.
-- If the backend is unreachable, the UI falls back to a **local heuristic
-  estimate** that is explicitly labeled "Local estimate (offline)" so it can
-  never be mistaken for the trained model.
-- The ML model is the **Random Forest (CardioAI Assessment Model)**: 500 trees,
-  `max_depth=20`, `class_weight="balanced"`, trained on the 20 clinical NHANES
-  features the assessment wizard collects (ROC AUC 0.9005 on hold-out).
-  Risk thresholds: `p < 0.30` Low, `0.30 ≤ p < 0.70` Moderate, `p ≥ 0.70` High.
+- There is **no database** (no Supabase, PostgreSQL, SQLAlchemy, or SQLite)
+  and no offline heuristic fallback. If the ML service is unreachable the
+  assessment is refused rather than approximated.
+- The ML model is the **Random Forest (Composite CVD — 44 features)**, driven by
+  `feature_contract.json`. Risk thresholds: `p < 0.30` Low,
+  `0.30 ≤ p < 0.70` Moderate, `p ≥ 0.70` High.
+- Reports (Print, PDF, JSON, CSV) are generated in the browser from the
+  assessment returned by the API, so they require no server-side storage.
+
+### Assessment history limitation
+
+Assessment history is held in backend process memory only. It survives normal
+requests but is **cleared when the backend restarts** (and is not shared across
+multiple worker processes). The current assessment is returned directly by
+`POST /api/assessments`, so the Reports page and all downloads continue to work
+for the assessment just submitted. If durable history is required later, it
+would need an external persistence service — intentionally not added here.
 
 ---
 
@@ -50,14 +60,18 @@ python -m uvicorn app.main:app --reload --port 8000
 Verify:
 
 ```powershell
-Invoke-RestMethod http://127.0.0.1:8000/api/health        # {"status":"ok"}
-Invoke-RestMethod http://127.0.0.1:8000/api/predict/status # {"ready":true,"model":"..."}
+Invoke-RestMethod http://127.0.0.1:8000/api/health        # status ok + model.ready
+Invoke-RestMethod http://127.0.0.1:8000/api/predict/status # ready: true
 ```
 
 The model artifacts must exist at
-`Models/CardioAI_Assessment_Model.pkl` and
-`Models/CardioAI_Assessment_Features.pkl` (the defaults). Override via the
-`ML_MODEL_PATH` / `ML_FEATURES_PATH` environment variables or `backend/.env`.
+`Models/Random_Forest/Random_Forest_Model.pkl` and
+`Models/CardioAI_Assessment_Features.pkl`, with the contract at
+`feature_contract.json` (the defaults). Override via the `ML_MODEL_PATH`,
+`ML_FEATURES_PATH`, and `ML_CONTRACT_PATH` environment variables or
+`backend/.env`.
+
+No database environment variables are read.
 
 ### Frontend
 
@@ -74,9 +88,9 @@ cd backend
 python -m pytest tests -q
 ```
 
-Coverage: health endpoints, assessment persistence (create/list/get/latest),
-prediction happy path, determinism, and validation (range + enum + extra-field
-rejection).
+Coverage: health (model status, no DB), assessment create/list/get/latest
+without a database, prediction happy path, determinism, and validation
+(range + enum + missing-section rejection).
 
 ### Production build
 
@@ -97,8 +111,8 @@ docker compose up --build
 
 - `frontend` — nginx serving the built SPA on `:3000` with `/api` reverse
   proxied to `backend`; health probe at `GET /healthz`.
-- `backend` — FastAPI + model on `:8000`, model loaded from the image, SQLite
-  persisted in the `cardioinsight-data` volume.
+- `backend` — FastAPI + model on `:8000`, model loaded from the image. No
+  database or writable volume is required.
 
 Build-time option for the frontend image: the "Download Master Dataset" button
 ships the 124 MB NHANES CSV. To exclude it:
@@ -107,10 +121,25 @@ ships the 124 MB NHANES CSV. To exclude it:
 docker compose build --build-arg INCLUDE_DATASET=false frontend
 ```
 
-(The landing Dataset page then renders without a download link; the file
-remains available in the repository `frontend/public/datasets/`.)
+### Option B — Render (native Python web service)
 
-### Option B — Bare metal / VM
+- **Build command:** `pip install -r backend/requirements.txt`
+- **Start command:**
+  `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
+- **Health check path:** `/api/health`
+- **Required environment variables:** none for the database. The model paths
+  default to the repository layout; optionally set `ML_MODEL_PATH`,
+  `ML_CONTRACT_PATH`, `ML_FEATURES_PATH`, and `ALLOWED_ORIGINS`.
+- **Remove** `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL`, `PGHOST`, `PGPORT`, `PGUSER`,
+  `PGPASSWORD`, `PGDATABASE`, and any other database credentials from the
+  service. The app no longer reads them.
+
+The frontend is served by the existing Render static site
+(`render.yaml` → `cardioinsight-frontend`). Keep
+`frontend/.env.production`'s `VITE_API_BASE_URL` pointing at the backend.
+
+### Option C — Bare metal / VM
 
 1. Backend: run uvicorn (above) with `ENVIRONMENT=production`.
 2. Frontend: serve `frontend/dist/` with any static server and reverse-proxy
@@ -120,14 +149,16 @@ remains available in the repository `frontend/public/datasets/`.)
 
 ## Configuration reference
 
-| Variable            | Default                                        | Purpose                                   |
-| ------------------- | ---------------------------------------------- | ----------------------------------------- |
-| `DATABASE_URL`      | `sqlite:///backend/database/cardioinsight.db`  | SQLAlchemy URL (use PostgreSQL in prod)   |
-| `ML_MODEL_PATH`     | `Models/CardioAI_Assessment_Model.pkl`         | Path to the deployment Random Forest      |
-| `ML_FEATURES_PATH`  | `Models/CardioAI_Assessment_Features.pkl`      | Ordered 20-feature list                   |
-| `ALLOWED_ORIGINS`   | localhost:5173/3000 (dev)                      | CORS origins (comma-separated)            |
-| `HOST`/`PORT`       | `127.0.0.1`/`8000`                             | uvicorn bind address                      |
-| `ENVIRONMENT`       | `development`                                  | `development` / `production`              |
+| Variable            | Default                                          | Purpose                                   |
+| ------------------- | ------------------------------------------------ | ----------------------------------------- |
+| `ML_MODEL_PATH`     | `Models/Random_Forest/Random_Forest_Model.pkl`   | Path to the deployment Random Forest      |
+| `ML_FEATURES_PATH`  | `Models/CardioAI_Assessment_Features.pkl`        | Fallback ordered feature list             |
+| `ML_CONTRACT_PATH`  | `feature_contract.json`                          | Canonical 44-feature contract             |
+| `ALLOWED_ORIGINS`   | localhost:5173/3000 + production frontend        | CORS origins (comma-separated)            |
+| `HOST`/`PORT`       | `127.0.0.1`/`8000`                               | uvicorn bind address                      |
+| `ENVIRONMENT`       | `development`                                    | `development` / `production`              |
+
+There is deliberately **no** `DATABASE_URL` or database configuration.
 
 ---
 
@@ -139,30 +170,34 @@ remains available in the repository `frontend/public/datasets/`.)
 - backend: `pip install -r backend/requirements.txt` → `pytest tests`
 
 Both jobs need the deployment model artifacts present in the repository
-(negated in `.gitignore`). Since `CardioAI_Assessment_Model.pkl` is ~55 MB,
-track it with **Git LFS** (`git lfs track "Models/CardioAI_Assessment_Model.pkl"`)
+(negated in `.gitignore`). Since the model is large, track it with **Git LFS**
 so CI can `actions/checkout@v4` it normally.
 
 ---
 
 ## Health checks
 
-| Probe                      | Expected                              |
-| -------------------------- | ------------------------------------- |
-| `GET /api/health`          | `{"status":"ok"}` (DB reachable)      |
-| `GET /health`              | `{"status":"ok"}` (legacy alias)      |
-| `GET /api/predict/status`  | `{"ready":true,"model":"..."}`        |
-| `GET /healthz` (nginx)     | `200 ok`                              |
+| Probe                      | Expected                                              |
+| -------------------------- | ----------------------------------------------------- |
+| `GET /api/health`          | `200` + `status: ok`, `model.ready: true`             |
+| `GET /health`              | Same as `/api/health` (legacy alias)                  |
+| `GET /api/predict/status`  | `{"ready":true,"model":"..."}`                        |
+| `GET /healthz` (nginx)     | `200 ok`                                              |
+
+If the trained model fails to load, `/api/health` and `/health` return `503`
+with `status: degraded` and the precise (non-secret) reason — no database probe
+is performed.
 
 ---
 
 ## API
 
 - `POST /api/predict` — body `{"input": {AssessmentInput}}`, returns
-  `{model, probability, level, confidence, feature_names, feature_values}`.
+  `{model, probability, level, confidence, feature_names, feature_values,
+  expected_value, contributions}`.
   `422` for out-of-range/invalid values, `503` when the model is unavailable.
-- `POST /api/assessments` — persists a record; returns it with the server
-  sequential id `CI-YYYYMMDD-NNNN`.
+- `POST /api/assessments` — stores a record in process memory; returns it with
+  the server sequential id `CI-YYYYMMDD-NNNN`.
 - `GET /api/assessments`, `GET /api/assessments/latest`,
   `GET /api/assessments/{id}`.
 - `GET /api/health`, `GET /health`.

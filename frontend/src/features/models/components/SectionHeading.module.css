@@ -22,7 +22,7 @@
 }
 
 .copy h2 {
-  font-size: var(--font-h2);
+  font-size: var(--font-size-h2);
   font-weight: var(--weight-bold);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -30,7 +30,7 @@
 }
 
 .copy p {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   margin: 0;
   max-width: 640px;

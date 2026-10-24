@@ -39,14 +39,14 @@
 
 .copy h3 {
   margin: 0 0 var(--space-1);
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
 }
 
 .copy p {
   margin: 0;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
   max-width: 560px;

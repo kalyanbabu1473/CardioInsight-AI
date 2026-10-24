@@ -1,29 +1,22 @@
-"""Assessments API — persistence endpoints.
+"""Assessments API — DB-free persistence endpoints.
 
-The risk engine lives in the frontend; these routes only store, retrieve, and
-list the records the client persists.
+The risk engine runs on the backend ML service and the frontend keeps the
+returned assessment for immediate reporting. These routes store, retrieve, and
+list the records for the lifetime of this process using an in-memory store, so
+no database connection is required.
+
+Durability note: history is process-local and is cleared when the backend
+restarts. The current assessment is returned directly from ``POST`` and every
+report download is generated from that returned record, so reports remain fully
+functional without durable server-side history.
 """
 
-from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, HTTPException, status
 
-from app.database.session import get_db
-from app.models.assessment import Assessment
 from app.schemas.assessment import AssessmentCreate, AssessmentRead
-from app.utils.assessment_ids import build_id, id_prefix
-
-from datetime import datetime, timezone
+from app.services.assessment_store import store
 
 router = APIRouter(prefix="/api/assessments", tags=["assessments"])
-
-
-def _next_sequence(db: Session, now: datetime) -> int:
-    prefix = id_prefix(now)
-    existing = db.scalars(
-        select(Assessment.id).where(Assessment.id.like(f"{prefix}%"))
-    ).all()
-    return len(existing) + 1
 
 
 @router.post(
@@ -31,52 +24,41 @@ def _next_sequence(db: Session, now: datetime) -> int:
     response_model=AssessmentRead,
     status_code=status.HTTP_201_CREATED,
 )
-def create_assessment(payload: AssessmentCreate, db: Session = Depends(get_db)):
-    """Persists a client-computed assessment and assigns its sequential ID."""
-    now = datetime.now(timezone.utc)
-    assessment = Assessment(
-        id=build_id(now, _next_sequence(db, now)),
-        created_at=now,
+def create_assessment(payload: AssessmentCreate):
+    """Stores a client-computed assessment and assigns its sequential ID."""
+    assessment = store.create(
         model=payload.model,
         model_tagline=payload.model_tagline,
         input=payload.input,
         result=payload.result,
     )
-    db.add(assessment)
-    db.commit()
-    db.refresh(assessment)
-    return AssessmentRead.from_model(assessment)
+    return AssessmentRead.from_record(assessment)
 
 
 @router.get("", response_model=list[AssessmentRead])
-def list_assessments(db: Session = Depends(get_db)):
-    """List every persisted assessment, newest first."""
-    records = db.scalars(
-        select(Assessment).order_by(Assessment.created_at.desc())
-    ).all()
-    return [AssessmentRead.from_model(r) for r in records]
+def list_assessments():
+    """List every assessment in this process, newest first."""
+    return [AssessmentRead.from_record(r) for r in store.list()]
 
 
 @router.get("/latest", response_model=AssessmentRead)
-def latest_assessment(db: Session = Depends(get_db)):
-    """Return the most recently persisted assessment."""
-    record = db.scalars(
-        select(Assessment).order_by(Assessment.created_at.desc()).limit(1)
-    ).first()
+def latest_assessment():
+    """Return the most recently stored assessment."""
+    record = store.latest()
     if record is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="No assessments found"
         )
-    return AssessmentRead.from_model(record)
+    return AssessmentRead.from_record(record)
 
 
 @router.get("/{assessment_id}", response_model=AssessmentRead)
-def get_assessment(assessment_id: str, db: Session = Depends(get_db)):
+def get_assessment(assessment_id: str):
     """Return a single assessment by ID."""
-    record = db.get(Assessment, assessment_id)
+    record = store.get(assessment_id)
     if record is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Assessment {assessment_id} not found",
         )
-    return AssessmentRead.from_model(record)
+    return AssessmentRead.from_record(record)

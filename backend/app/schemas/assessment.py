@@ -4,7 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.models.assessment import Assessment
+from app.services.assessment_store import AssessmentRecord
 from app.utils.legacy import is_legacy_input
 
 
@@ -30,7 +30,7 @@ class AssessmentCreate(BaseModel):
 class AssessmentRead(BaseModel):
     """Record returned to the client — mirrors ``AssessmentResult`` shape.
 
-    ``legacy`` marks records persisted against the pre-contract (20-feature)
+    ``legacy`` marks records stored against the pre-contract (20-feature)
     input shape so the UI can render them without treating their inputs as
     compatible with the deployed 44-feature model.
     """
@@ -44,7 +44,7 @@ class AssessmentRead(BaseModel):
     result: dict[str, Any]
 
     @classmethod
-    def from_model(cls, assessment: Assessment) -> "AssessmentRead":
+    def from_record(cls, assessment: AssessmentRecord) -> "AssessmentRead":
         return cls(
             id=assessment.id,
             createdAt=assessment.created_at.isoformat(),

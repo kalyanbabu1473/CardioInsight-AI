@@ -29,7 +29,7 @@
 }
 
 .label {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 0.05em;

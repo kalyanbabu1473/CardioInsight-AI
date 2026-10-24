@@ -65,7 +65,7 @@
 }
 
 .title {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   font-weight: var(--weight-bold);
   color: var(--color-text-primary);
   line-height: var(--leading-tight);
@@ -73,7 +73,7 @@
 }
 
 .detail {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
   line-height: var(--leading-tight);
 }
@@ -81,9 +81,9 @@
 /* arrow between steps */
 .arrow {
   align-self: flex-start;
-  margin-top: calc((72px - var(--font-h3)) / 2);
+  margin-top: calc((72px - var(--font-size-h3)) / 2);
   color: var(--color-primary);
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   line-height: 1;
   flex-shrink: 0;

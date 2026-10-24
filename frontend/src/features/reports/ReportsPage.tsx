@@ -1,6 +1,14 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FileText, Stethoscope, X } from "lucide-react";
+import {
+  Download,
+  FileJson,
+  FileSpreadsheet,
+  FileText,
+  Printer,
+  Stethoscope,
+  X,
+} from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { Button } from "@/components/ui";
@@ -11,6 +19,7 @@ import AssessmentHistory from "./components/AssessmentHistory";
 import ReportViewer from "./components/ReportViewer";
 import PrintableReport from "./PrintableReport";
 import { usePrintReport } from "./hooks/usePrintReport";
+import { downloadCsv, downloadJson, exportPdf } from "./reportService";
 
 import styles from "./ReportsPage.module.css";
 
@@ -70,6 +79,43 @@ export default function ReportsPage() {
         </div>
 
         <div className={styles.right}>
+          {printable && (
+            <div className={styles.actions} role="toolbar" aria-label="Report exports">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => exportPdf(printable)}
+              >
+                <Download size={15} />
+                PDF
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => downloadJson(printable)}
+              >
+                <FileJson size={15} />
+                JSON
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => downloadCsv(printable)}
+              >
+                <FileSpreadsheet size={15} />
+                CSV
+              </Button>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handlePrintReport}
+                disabled={isPrinting}
+              >
+                <Printer size={15} />
+                {isPrinting ? "Preparing…" : "Print"}
+              </Button>
+            </div>
+          )}
           {!hasAssessment ? (
             <AssessmentPromo
               title="No reports available."

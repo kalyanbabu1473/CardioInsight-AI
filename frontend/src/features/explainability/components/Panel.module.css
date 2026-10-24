@@ -29,7 +29,7 @@
 }
 
 .heading h2 {
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -38,7 +38,7 @@
 
 .heading p {
   margin: var(--space-1) 0 0;
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   line-height: var(--leading-normal);
 }

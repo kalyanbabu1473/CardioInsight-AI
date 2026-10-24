@@ -44,15 +44,16 @@
   border: 1px solid color-mix(in srgb, var(--color-purple) 20%, transparent);
   background: var(--color-purple-tint);
   color: var(--color-purple);
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-bold);
   letter-spacing: 0.08em;
 }
 
 .title {
   margin: var(--space-4) 0 var(--space-3);
-  font-size: var(--font-h1);
-  font-weight: var(--weight-extrabold);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-h1);
+  font-weight: var(--weight-regular);
   line-height: var(--leading-tight);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -61,7 +62,7 @@
 .subtitle {
   max-width: 640px;
   margin: 0 auto;
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-relaxed);
   color: var(--color-text-secondary);
 }
@@ -85,7 +86,7 @@
   }
 
   .title {
-    font-size: var(--font-h2);
+    font-size: var(--font-size-h2);
   }
 
   .pipelineCard {

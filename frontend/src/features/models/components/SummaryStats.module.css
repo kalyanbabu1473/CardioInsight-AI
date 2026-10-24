@@ -29,7 +29,7 @@
 
 .meta strong {
   display: block;
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-extrabold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -37,7 +37,7 @@
 }
 
 .meta span {
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 

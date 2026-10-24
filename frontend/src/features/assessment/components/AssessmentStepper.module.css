@@ -14,7 +14,7 @@
 }
 
 .metaLabel {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -28,14 +28,14 @@
 }
 
 .percentValue {
-  font-size: var(--font-h4);
+  font-size: var(--font-size-h4);
   font-weight: var(--weight-bold);
   color: var(--color-primary);
   font-variant-numeric: tabular-nums;
 }
 
 .percentLabel {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
 }
 
@@ -112,7 +112,7 @@
 }
 
 .label {
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   font-weight: var(--weight-semibold);
   text-align: center;
   line-height: var(--leading-tight);
@@ -144,13 +144,18 @@
 
 .progress {
   margin-top: var(--space-4);
-  height: 4px;
+  height: 6px;
   border-radius: var(--radius-full);
   background: var(--color-surface-alt);
-  overflow: hidden;
+  border: 1px solid var(--color-border);
+  position: relative;
+  overflow: visible;
 }
 
 .progressFill {
+  position: absolute;
+  top: 0;
+  left: 0;
   height: 100%;
   border-radius: var(--radius-full);
   background: linear-gradient(

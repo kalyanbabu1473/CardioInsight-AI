@@ -7,8 +7,9 @@
 }
 
 .header h2 {
-  font-size: var(--font-h2);
-  font-weight: var(--weight-bold);
+  font-family: var(--font-serif);
+  font-size: var(--font-size-h2);
+  font-weight: var(--weight-regular);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
 }
@@ -16,6 +17,6 @@
 .header p {
   margin-top: var(--space-2);
   color: var(--color-text-secondary);
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   line-height: var(--leading-normal);
 }

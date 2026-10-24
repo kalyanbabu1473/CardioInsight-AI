@@ -1,18 +1,15 @@
 # CardioInsight AI backend runtime dependencies.
+# No database driver/ORM is required: assessments are served from process-local
+# memory and the trained model is loaded directly from disk.
+
 # Runtime API layer
 fastapi>=0.141,<1.0
 uvicorn[standard]>=0.52,<1.0
-sqlalchemy>=2.0,<3.0
 pydantic>=2.13,<3.0
 python-dotenv>=1.0,<2.0
-psycopg2-binary
 
-# Database driver — PostgreSQL. SQLAlchemy still supports SQLite via the same
-# DATABASE_URL-agnostic session layer.
-psycopg[binary]>=3.2,<4.0
-
-# ML serving. The deployed CardioAI_Assessment_Model.pkl was trained and
-# verified with scikit-learn 1.9.0 — do NOT downgrade.
+# ML serving. The deployed model was trained and verified with
+# scikit-learn 1.9.0 — do NOT downgrade.
 scikit-learn>=1.9.0,<1.10
 joblib>=1.5,<2.0
 numpy>=2.0,<3.0

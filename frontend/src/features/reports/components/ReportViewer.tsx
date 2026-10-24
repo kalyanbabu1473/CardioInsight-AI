@@ -353,7 +353,7 @@ export default function ReportViewer({
                   "contribution",
                 ]}
               />
-              <Bar dataKey="value" radius={[4, 4, 4, 4]} barSize={14}>
+              <Bar dataKey="value" radius={[6, 6, 6, 6]} barSize={16}>
                 {shapData.map((row) => (
                   <Cell
                     key={row.name}
@@ -407,7 +407,7 @@ export default function ReportViewer({
                   "relative importance",
                 ]}
               />
-              <Bar dataKey="value" fill="var(--color-primary)" radius={[4, 4, 4, 4]} barSize={14} />
+              <Bar dataKey="value" fill="var(--color-primary)" radius={[6, 6, 6, 6]} barSize={16} />
             </BarChart>
           </ResponsiveContainer>
         </div>

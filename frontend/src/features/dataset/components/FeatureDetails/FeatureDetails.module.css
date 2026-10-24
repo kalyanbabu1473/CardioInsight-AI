@@ -36,7 +36,7 @@
 }
 
 .header h2 {
-  font-size: var(--font-h3);
+  font-size: var(--font-size-h3);
   font-weight: var(--weight-bold);
   letter-spacing: -0.01em;
   color: var(--color-text-primary);
@@ -46,7 +46,7 @@
 .header p {
   margin: var(--space-1) 0 0;
   color: var(--color-text-muted);
-  font-size: var(--font-sm);
+  font-size: var(--font-size-sm);
 }
 
 .closeButton {
@@ -78,7 +78,7 @@
 
 .hero h1 {
   margin: 0;
-  font-size: var(--font-h2);
+  font-size: var(--font-size-h2);
   font-weight: var(--weight-extrabold);
   letter-spacing: -0.02em;
   color: var(--color-text-primary);
@@ -109,7 +109,7 @@
 
 .card span {
   display: block;
-  font-size: var(--font-label);
+  font-size: var(--font-size-label);
   color: var(--color-text-muted);
   margin-bottom: var(--space-1);
   text-transform: uppercase;
@@ -117,7 +117,7 @@
 }
 
 .card strong {
-  font-size: var(--font-body);
+  font-size: var(--font-size-body);
   color: var(--color-text-primary);
 }
 

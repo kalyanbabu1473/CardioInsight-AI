@@ -1,5 +1,4 @@
 import { Reveal } from "@/components/motion";
-import { Aurora } from "@/components/ui";
 import styles from "./DashboardPage.module.css";
 
 import DashboardLayout from "./components/DashboardLayout";
@@ -13,7 +12,6 @@ import RecentActivity from "./components/RecentActivity";
 export default function DashboardPage() {
   return (
     <DashboardLayout>
-      <Aurora />
       <div className={styles.page}>
         <Hero />
 
