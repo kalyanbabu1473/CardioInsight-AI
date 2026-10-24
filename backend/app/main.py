@@ -29,7 +29,14 @@ logger = logging.getLogger("cardioinsight.startup")
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     """Verify artifact integrity at startup and log fail-closed status."""
-    integrity = verify_artifacts()
+    try:
+        integrity = verify_artifacts()
+    except Exception as exc:  # noqa: BLE001 - report configuration failures
+        integrity = {
+            "ok": False,
+            "manifest_path": None,
+            "errors": [f"{type(exc).__name__}: {exc}"],
+        }
     if integrity["ok"]:
         logger.info("Artifact manifest verified: %s", integrity["manifest_path"])
     else:

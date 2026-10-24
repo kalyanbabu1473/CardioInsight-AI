@@ -98,6 +98,13 @@ committed binary. The manifest detects accidental corruption or partial
 deployment; it is not a signature and does not stop an attacker who can rewrite
 every artifact.
 
+Artifact paths are resolved from the repository root, not from the current
+working directory. Defaults select the clinical model and all of its matching
+metadata. Relative overrides are also anchored at the repository root and must
+keep the canonical artifact filenames. A stale legacy override such as
+`Random_Forest_Model.pkl` or a relative path escaping the repository fails before
+hash verification, so the build cannot silently switch models.
+
 ---
 
 ## Local development
@@ -197,14 +204,19 @@ docker compose build --build-arg INCLUDE_DATASET=false frontend
 - **Start command:**
   `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 - **Health check path:** `/api/health`
+- **Root directory:** repository root (`backend` must not be used as the
+  service root, because the build command resolves `backend/scripts/...`).
 - The deployment model is committed as a normal binary, **not Git LFS**.
   The build-time verification fails the deploy if the checkout contains an LFS
   pointer or an artifact/manifest mismatch instead of serving repeated `503`s.
-- **Required environment variables:** none for the database. The model paths
-  default to the repository layout; optionally set `ML_MODEL_PATH`,
-  `ML_CALIBRATOR_PATH`, `ML_CONTRACT_PATH`, `ML_FEATURES_PATH`,
-  `ML_PREPROCESSING_PATH`, `ML_METRICS_PATH`, `ML_MANIFEST_PATH`, and
-  `ALLOWED_ORIGINS`.
+- **Required environment variables:** none for the database or model paths.
+  Leave `ML_MODEL_PATH`, `ML_CALIBRATOR_PATH`, `ML_FEATURES_PATH`,
+  `ML_CONTRACT_PATH`, `ML_PREPROCESSING_PATH`, `ML_METRICS_PATH`, and
+  `ML_MANIFEST_PATH` unset so the canonical repository defaults are used.
+  Delete any existing overrides, especially legacy values such as
+  `../Models/Random_Forest/Random_Forest_Model.pkl`; they are not needed and
+  now fail configuration validation. Set only `ALLOWED_ORIGINS` if the frontend
+  origin differs from the default.
 - **Remove** `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_ANON_KEY`,
   `SUPABASE_SERVICE_ROLE_KEY`, `POSTGRES_URL`, `PGHOST`, `PGPORT`, `PGUSER`,
   `PGPASSWORD`, `PGDATABASE`, and any other database credentials from the
@@ -278,6 +290,12 @@ real model. Confirm it with the build log, use the build command above, then
 clear the Render build cache and deploy the commit containing the real binary.
 A start-time log line `ML model readiness failed at startup: ...` reports the
 same sanitized reason before health checks run.
+
+If the verifier prints `../Models/Random_Forest/Random_Forest_Model.pkl`,
+`../feature_contract.json`, or `source: ML_MODEL_PATH`, the Render service has
+stale path overrides. Delete the `ML_*` variables from the service, keep the
+repository root as the service root, clear the build cache, and redeploy. The
+default paths then resolve to the committed clinical artifacts.
 
 ---
 

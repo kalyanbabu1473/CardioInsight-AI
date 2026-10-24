@@ -28,7 +28,11 @@ import pandas as pd  # noqa: E402
 from sklearn.ensemble import RandomForestClassifier  # noqa: E402
 from sklearn.isotonic import IsotonicRegression  # noqa: E402
 
-from app.core.config import CONTRACT_PATH, calibrator_path, model_path  # noqa: E402
+from app.core.config import (  # noqa: E402
+    REPO_ROOT,
+    ArtifactConfigurationError,
+    artifact_configuration,
+)
 from app.core.feature_contract import feature_order, load_contract  # noqa: E402
 from app.ml.artifact_manifest import verify_artifacts  # noqa: E402
 
@@ -64,18 +68,48 @@ def _representative_row(contract: dict) -> list[float]:
 
 
 def main() -> int:
-    path = Path(model_path)
-    cal_path = Path(calibrator_path)
-    print(f"model path:      {model_path}")
-    print(f"calibrator path: {calibrator_path}")
-    print(f"contract path:   {CONTRACT_PATH}")
+    try:
+        configuration = artifact_configuration()
+    except ArtifactConfigurationError as exc:
+        check("artifact configuration", False, str(exc))
+        return _finish()
 
-    integrity = verify_artifacts(force=True)
+    print(f"repository root: {REPO_ROOT}")
+    for role, item in configuration.items():
+        print(f"{role} path: {item.path} (source: {item.source})")
+
+    path = configuration["model"].path
+    cal_path = configuration["calibrator"].path
+
+    try:
+        integrity = verify_artifacts(force=True)
+    except Exception as exc:  # noqa: BLE001 - fail the build with the reason
+        check(
+            "artifact manifest verifies",
+            False,
+            f"{type(exc).__name__}: {exc}",
+        )
+        return _finish()
     check(
         "artifact manifest verifies",
         integrity["ok"],
         "; ".join(integrity["errors"]) if integrity["errors"] else str(integrity["manifest_path"]),
     )
+    if integrity["ok"]:
+        manifest_paths = {
+            role: Path(entry["path"]).resolve()
+            for role, entry in integrity["artifacts"].items()
+        }
+        configured = {
+            role: item.path
+            for role, item in configuration.items()
+            if role != "manifest"
+        }
+        check(
+            "manifest verification used configured artifact paths",
+            manifest_paths == configured,
+            str(configured) if manifest_paths != configured else "",
+        )
 
     check("model file exists", path.is_file(), str(path) if path.is_file() else "missing")
     if not path.is_file():

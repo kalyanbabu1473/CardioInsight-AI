@@ -20,15 +20,7 @@ from pathlib import Path
 
 import joblib
 
-from app.core.config import (
-    CONTRACT_PATH,
-    MANIFEST_PATH,
-    METRICS_PATH,
-    PREPROCESSING_PATH,
-    calibrator_path,
-    features_path,
-    model_path,
-)
+from app.core.config import artifact_configuration
 
 MANIFEST_SCHEMA_VERSION = "1.0.0"
 ROLES = ("model", "calibrator", "features", "contract", "preprocessing", "metrics")
@@ -50,14 +42,15 @@ class ArtifactPaths:
 
 
 def configured_paths() -> ArtifactPaths:
+    configuration = artifact_configuration()
     return ArtifactPaths(
-        manifest=Path(MANIFEST_PATH),
-        model=Path(model_path),
-        calibrator=Path(calibrator_path),
-        features=Path(features_path),
-        contract=Path(CONTRACT_PATH),
-        preprocessing=Path(PREPROCESSING_PATH),
-        metrics=Path(METRICS_PATH),
+        manifest=configuration["manifest"].path,
+        model=configuration["model"].path,
+        calibrator=configuration["calibrator"].path,
+        features=configuration["features"].path,
+        contract=configuration["contract"].path,
+        preprocessing=configuration["preprocessing"].path,
+        metrics=configuration["metrics"].path,
     )
 
 
