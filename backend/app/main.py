@@ -37,6 +37,11 @@ async def lifespan(_: FastAPI):
             "Artifact manifest verification failed: %s",
             "; ".join(integrity["errors"]),
         )
+    if model_ready():
+        logger.info("ML model ready: %s", MODEL_NAME)
+    else:
+        reason = model_unavailable_reason() or "unknown readiness failure"
+        logger.error("ML model readiness failed at startup: %s", reason)
     yield
 
 

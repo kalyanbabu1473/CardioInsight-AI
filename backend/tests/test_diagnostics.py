@@ -1,5 +1,8 @@
 """Unit tests for model diagnostics (unavailability must never be silent)."""
 
+import logging
+
+from fastapi.testclient import TestClient
 from sklearn.isotonic import IsotonicRegression
 
 from app.ml.model_loader import (
@@ -79,3 +82,27 @@ def test_model_ready_is_false_for_unusable_calibrator(monkeypatch):
         model_loader, "load_calibrator", lambda: IsotonicRegression()
     )
     assert model_ready() is False
+
+
+def test_startup_logs_sanitized_model_readiness_failure(monkeypatch, caplog):
+    import app.main as main
+
+    reason = "sha256 mismatch: model; size mismatch: model"
+    monkeypatch.setattr(main, "model_ready", lambda: False)
+    monkeypatch.setattr(main, "model_unavailable_reason", lambda: reason)
+
+    with caplog.at_level(logging.ERROR, logger="cardioinsight.startup"):
+        with TestClient(main.app) as client:
+            response = client.get("/api/health")
+
+    assert response.status_code == 503
+    messages = [
+        record.getMessage()
+        for record in caplog.records
+        if record.name == "cardioinsight.startup"
+    ]
+    assert any(
+        "ML model readiness failed at startup" in message
+        and reason in message
+        for message in messages
+    )

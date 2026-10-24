@@ -22,8 +22,9 @@ npm-debug.log*
 
 # ML artefacts — large serialized research models + train-only outputs are NOT
 # committed. The deployment artifact (assessment model + feature list) IS needed
-# at runtime by backend/CI/Docker, so it is tracked via explicit negation (push
-# the large ~21.8 MB model binary with Git LFS).
+# at runtime by backend/CI/Docker, so it is tracked via explicit negation. The
+# ~21.8 MB clinical model is committed as a normal binary, not Git LFS, because
+# deployment hosts do not reliably smudge LFS during checkout.
 Models/*.pkl
 !Models/CardioAI_Assessment_Model.pkl
 !Models/CardioAI_Assessment_Features.pkl

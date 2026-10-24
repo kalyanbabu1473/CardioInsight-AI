@@ -92,9 +92,11 @@ At startup and on model load, the backend verifies
 `Models/CardioAI_Clinical_Manifest.json` against SHA-256 hashes and byte sizes
 for the model, calibrator, features, contract, preprocessing metadata, and
 metrics. It also checks the 18-feature order and that preprocessing is marked
-complete-case. A mismatch makes the model unavailable and health checks return
-`503`. The manifest detects accidental corruption or partial deployment; it is
-not a signature and does not stop an attacker who can rewrite every artifact.
+complete-case. A Git LFS pointer or any mismatch makes the model unavailable and
+health checks return `503`; the deployment model must therefore be a real
+committed binary. The manifest detects accidental corruption or partial
+deployment; it is not a signature and does not stop an attacker who can rewrite
+every artifact.
 
 ---
 
@@ -190,10 +192,14 @@ docker compose build --build-arg INCLUDE_DATASET=false frontend
 
 ### Option B — Render (native Python web service)
 
-- **Build command:** `pip install -r backend/requirements.txt`
+- **Build command:**
+  `pip install -r backend/requirements.txt && python backend/scripts/verify_model.py`
 - **Start command:**
   `cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT`
 - **Health check path:** `/api/health`
+- The deployment model is committed as a normal binary, **not Git LFS**.
+  The build-time verification fails the deploy if the checkout contains an LFS
+  pointer or an artifact/manifest mismatch instead of serving repeated `503`s.
 - **Required environment variables:** none for the database. The model paths
   default to the repository layout; optionally set `ML_MODEL_PATH`,
   `ML_CALIBRATOR_PATH`, `ML_CONTRACT_PATH`, `ML_FEATURES_PATH`,
@@ -244,10 +250,12 @@ There is deliberately **no** `DATABASE_URL` or database configuration.
   `verify_model.py` (including manifest) -> `pytest tests`
 
 Both jobs need the deployment artifacts present in the repository (negated in
-`.gitignore`). The 21.8 MB model is tracked with **Git LFS**; the calibrator,
-feature list, preprocessing metadata, metrics, and manifest are small tracked
-files. CI verifies the manifest, feature order, calibrator, and model before
-running the backend suite.
+`.gitignore`). The 21.8 MB clinical model is committed as a **normal binary**,
+not Git LFS, so deployment hosts receive the real file without an LFS smudge
+step. The calibrator, feature list, preprocessing metadata, metrics, and
+manifest are small tracked files. CI verifies the manifest, feature order,
+calibrator, and model before running the backend suite; a regression test also
+rejects re-tracking the clinical model with LFS.
 
 ---
 
@@ -263,6 +271,13 @@ running the backend suite.
 If the trained model fails to load, `/api/health` and `/health` return `503`
 with `status: degraded` and the precise (non-secret) reason — no database probe
 is performed.
+
+On Render, a `503` whose reason mentions `lfs_pointer=True` or a model
+size/hash mismatch means the checkout contains an LFS pointer instead of the
+real model. Confirm it with the build log, use the build command above, then
+clear the Render build cache and deploy the commit containing the real binary.
+A start-time log line `ML model readiness failed at startup: ...` reports the
+same sanitized reason before health checks run.
 
 ---
 

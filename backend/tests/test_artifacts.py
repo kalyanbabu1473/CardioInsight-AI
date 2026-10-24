@@ -45,6 +45,22 @@ def test_deployed_artifacts_are_real_files_not_lfs_pointers():
     assert Path(model_path).stat().st_size > 1_000_000
 
 
+def test_deployment_model_is_not_git_lfs_tracked():
+    attributes = (REPO_ROOT / ".gitattributes").read_text(encoding="utf-8")
+    rules = [
+        line.split()
+        for line in attributes.splitlines()
+        if line.strip() and not line.lstrip().startswith("#")
+    ]
+    model_rules = [
+        rule
+        for rule in rules
+        if rule and rule[0] == "Models/CardioAI_Clinical_Model.pkl"
+    ]
+    for rule in model_rules:
+        assert "filter=lfs" not in rule[1:]
+
+
 def test_model_identity_and_hyperparameters(model):
     assert isinstance(model, RandomForestClassifier)
     assert model.n_estimators == 500
